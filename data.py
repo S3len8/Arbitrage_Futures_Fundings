@@ -57,3 +57,7 @@ def get_binance_futures_usdt():
 
 
 print(get_binance_futures_usdt()['BTCUSDT'])
+
+
+def get_bybit_futures_usdt():
+    pass
