@@ -54,12 +54,50 @@ def get_binance_futures_usdt():
     return result
 
 
-print(get_binance_futures_usdt()['BTCUSDT'])
+def get_bybit_futures_usdt():
+    # Getting tickers from Bybit
+    tickers = requests.get(
+        f"https://api.bybit.com/v5/market/tickers",
+        params={'category': 'linear'}
+    ).json()['result']['list']
+
+    # Adding symbols to dict
+    result = {}
+
+    # Cycle for searching symbols with USDT and orderbook in all tickers
+    for t in tickers:
+        symbol = t['symbol']
+
+        if not symbol.endswith('USDT'):
+            continue
+
+        order_book = requests.get(
+            f"https://api.bybit.com/v5/market/orderbook",
+            params={
+                'category': 'linear',
+                'symbol': symbol,
+                'limit': 1,
+            }
+        ).json()['result']
+
+        if not order_book['a'] or not order_book['b']:
+            continue
+
+        result[symbol] = {
+            'ask': float(order_book['a'][0][0]),
+            'bid': float(order_book['b'][0][0]),
+            'volume': float(t['turnover24h']),
+            'funding': float(t['fundingRate'])
+        }
+
+    return result
 
 
-# def get_bybit_futures_usdt():
-#     base = "https://api.bybit.com"
-#
-#     tickers = requests.get(
-#
-#     )
+binance = get_binance_futures_usdt()
+print("BINANCE:", len(binance))
+print(list(binance.items())[:3])
+print("BTCUSDT:", binance.get("BTCUSDT"))
+
+bybit = get_bybit_futures_usdt()
+print("BYBIT:", len(bybit))
+print(list(bybit.items())[:3])
