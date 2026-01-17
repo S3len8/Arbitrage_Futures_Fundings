@@ -2,21 +2,19 @@ import requests
 
 
 def get_binance_futures_usdt():
-    base = "https://fapi.binance.com"
-
     # Bid / Ask - берем для порівняння ф'ючерсів
     book = requests.get(
-        f"{base}/fapi/v1/ticker/bookTicker", timeout=5
+        f"https://fapi.binance.com/fapi/v1/ticker/bookTicker"
     ).json()
 
     # 24h volume - об'єм монети за 24 години
     tickers = requests.get(
-        f"{base}/fapi/v1/ticker/24hr", timeout=5
+        f"https://fapi.binance.com/fapi/v1/ticker/24hr"
     ).json()
 
     # Funding
     funding = requests.get(
-        f"{base}/fapi/v1/premiumIndex", timeout=5
+        f"https://fapi.binance.com/fapi/v1/premiumIndex"
     ).json()
 
     # Книга ордерів
@@ -59,5 +57,9 @@ def get_binance_futures_usdt():
 print(get_binance_futures_usdt()['BTCUSDT'])
 
 
-def get_bybit_futures_usdt():
-    pass
+# def get_bybit_futures_usdt():
+#     base = "https://api.bybit.com"
+#
+#     tickers = requests.get(
+#
+#     )
