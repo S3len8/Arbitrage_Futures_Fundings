@@ -95,9 +95,32 @@ def get_bybit_futures_usdt():
 
 binance = get_binance_futures_usdt()
 print("BINANCE:", len(binance))
-print(list(binance.items())[:3])
-print("BTCUSDT:", binance.get("BTCUSDT"))
+print(list(binance.items()))
 
 bybit = get_bybit_futures_usdt()
 print("BYBIT:", len(bybit))
-print(list(bybit.items())[:3])
+print(list(bybit.items()))
+
+
+def comparison_symbols(binance: dict, bybit: dict):
+    binance_symbols = set(binance.keys())
+    bybit_symbols = set(bybit.keys())
+
+    common_symbols = binance_symbols & bybit_symbols
+
+    result = {}
+
+    for symbol in common_symbols:
+        result[symbol] = {
+            "binance": binance[symbol],
+            "bybit": bybit[symbol]
+        }
+
+    return result
+
+
+common = comparison_symbols(binance, bybit)
+
+print("COMMON:", len(common))
+print(list(common.items())[:3])
+
