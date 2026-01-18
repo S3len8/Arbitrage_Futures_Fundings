@@ -95,12 +95,7 @@ try:
 
 
     binance = get_binance_futures_usdt()
-    print("BINANCE:", len(binance))
-    print(list(binance.items()))
-
     bybit = get_bybit_futures_usdt()
-    print("BYBIT:", len(bybit))
-    print(list(bybit.items()))
 
 
     def comparison_symbols(binance: dict, bybit: dict):
