@@ -34,6 +34,7 @@ binance = get_binance_symbol()
 bybit = get_bybit_symbol()
 
 
+# Function for comparison symbols
 def comparison_symbols(binance: list, bybit: list) -> list:
     binance_symbol = {item['symbol'] for item in binance}
     bybit_symbol = {item['symbol'] for item in bybit}
@@ -42,11 +43,13 @@ def comparison_symbols(binance: list, bybit: list) -> list:
     result = []
 
     for key in symbols:
-        result.append({
-            'symbol': key,
-        })
+        result.append(key)
 
     return result
+
+
+def get_data_binance():
+    pass
 
 
 print(get_binance_symbol(), len(get_binance_symbol()))
