@@ -30,9 +30,28 @@ def get_bybit_symbol():
     return result
 
 
+binance = get_binance_symbol()
+bybit = get_bybit_symbol()
+
+
+def comparison_symbols(binance: list, bybit: list) -> list:
+    binance_symbol = {item['symbol'] for item in binance}
+    bybit_symbol = {item['symbol'] for item in bybit}
+
+    symbols = binance_symbol & bybit_symbol
+    result = []
+
+    for key in symbols:
+        result.append({
+            'symbol': key,
+        })
+
+    return result
+
+
 print(get_binance_symbol(), len(get_binance_symbol()))
 print(get_bybit_symbol(), len(get_bybit_symbol()))
-
+print(comparison_symbols(binance=binance, bybit=bybit), len(comparison_symbols(binance, bybit)))
 
 # try:
 #     def get_binance_futures_usdt():
