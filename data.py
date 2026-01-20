@@ -92,21 +92,31 @@ def get_data_binance(common_symbols: list[str]) -> dict:
     return result
 
 
-def get_data_bybit(common_symbols: list) -> dict:
+def get_data_bybit(common_symbols: list[str]) -> dict:
     symbols_set = set(common_symbols)
     result = {}
-    # Get volume
-    k = requests.get(BINANCE_DATA).json()
-    # Get funding
-    v = requests.get(BINANCE_FUNDING).json()
-    # Get orderbook
-    q = requests.get(BINANCE_ORDER_BOOK).json()
+    # Get data
+    k = requests.get(BYBIT_DATA, params={'category': 'linear'}).json()
+
+    for t in k['result']['list']:
+        symbol = t['symbol']
+        if symbol not in symbols_set:
+            continue
+
+        result[symbol] = {
+            'bid': float(t['bid1Price']),
+            'ask': float(t['ask1Price']),
+            'volume 24H': float(t['turnover24h']),
+            'funding': float(t['fundingRate'])
+        }
+    return result
 
 
 print(get_binance_symbol(), len(get_binance_symbol()))
 print(get_bybit_symbol(), len(get_bybit_symbol()))
 print(len(comparison_symbols(binance, bybit)))
 print(get_data_binance(common_symbols), len(get_data_binance(common_symbols)))
+print(get_data_bybit(common_symbols), get_data_bybit(common_symbols))
 # try:
 #     def get_binance_futures_usdt():
 #         # Bid / Ask - берем для порівняння ф'ючерсів
