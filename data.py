@@ -116,7 +116,7 @@ try:
 
 
     common = comparison_symbols(binance, bybit)
-
+    print(type(common))
     print("COMMON:", len(common))
     print(list(common.items())[:3])
 except KeyboardInterrupt as e:
