@@ -1,6 +1,13 @@
 import requests
 
 
+BINANCE_ORDER_BOOK = 'https://fapi.binance.com/fapi/v1/ticker/bookTicker'
+BINANCE_DATA = 'https://fapi.binance.com/fapi/v1/ticker/24hr'
+BINANCE_FUNDING = 'https://fapi.binance.com/fapi/v1/premiumIndex'
+
+BYBIT_DATA = 'https://api.bybit.com/v5/market/tickers'
+
+
 # Function for getting only symbols from Binance
 def get_binance_symbol():
     url = 'https://fapi.binance.com/fapi/v1/exchangeInfo'
@@ -48,14 +55,58 @@ def comparison_symbols(binance: list, bybit: list) -> list:
     return result
 
 
-def get_data_binance():
-    pass
+common_symbols = comparison_symbols(binance=binance, bybit=bybit)
+
+
+# Function for data binance
+def get_data_binance(common_symbols: list[str]) -> dict:
+    symbols_set = set(common_symbols)
+    result = {}
+    # Get volume
+    k = requests.get(BINANCE_DATA).json()
+    # Get funding
+    v = requests.get(BINANCE_FUNDING).json()
+    # Get orderbook
+    q = requests.get(BINANCE_ORDER_BOOK).json()
+    funding = {
+        f['symbol']: float(f['lastFundingRate'])
+        for f in v
+        if f['symbol'] in symbols_set
+    }
+    volume = {
+        vol['symbol']: float(vol['quoteVolume'])
+        for vol in k
+        if vol['symbol'] in symbols_set
+    }
+    for t in q:
+        symbol = t['symbol']
+        if symbol not in symbols_set:
+            continue
+
+        result[symbol] = {
+            'bid': float(t['bidPrice']),
+            'ask': float(t['askPrice']),
+            'volume 24H': volume.get(symbol, 0.0),
+            'funding': funding.get(symbol, 0.0)
+        }
+    return result
+
+
+def get_data_bybit(common_symbols: list) -> dict:
+    symbols_set = set(common_symbols)
+    result = {}
+    # Get volume
+    k = requests.get(BINANCE_DATA).json()
+    # Get funding
+    v = requests.get(BINANCE_FUNDING).json()
+    # Get orderbook
+    q = requests.get(BINANCE_ORDER_BOOK).json()
 
 
 print(get_binance_symbol(), len(get_binance_symbol()))
 print(get_bybit_symbol(), len(get_bybit_symbol()))
-print(comparison_symbols(binance=binance, bybit=bybit), len(comparison_symbols(binance, bybit)))
-
+print(len(comparison_symbols(binance, bybit)))
+print(get_data_binance(common_symbols), len(get_data_binance(common_symbols)))
 # try:
 #     def get_binance_futures_usdt():
 #         # Bid / Ask - берем для порівняння ф'ючерсів
