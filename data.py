@@ -46,16 +46,10 @@ def comparison_symbols(binance: list, bybit: list) -> list:
     binance_symbol = {item['symbol'] for item in binance}
     bybit_symbol = {item['symbol'] for item in bybit}
 
-    symbols = binance_symbol & bybit_symbol
-    result = []
-
-    for key in symbols:
-        result.append(key)
-
-    return result
+    return list(binance_symbol & bybit_symbol)
 
 
-common_symbols = comparison_symbols(binance=binance, bybit=bybit)
+common_symbols = comparison_symbols(binance=binance, bybit=bybit)  # <class 'list'>
 
 
 # Function for data binance
@@ -112,11 +106,17 @@ def get_data_bybit(common_symbols: list[str]) -> dict:
     return result
 
 
-print(get_binance_symbol(), len(get_binance_symbol()))
-print(get_bybit_symbol(), len(get_bybit_symbol()))
-print(len(comparison_symbols(binance, bybit)))
-print(get_data_binance(common_symbols), len(get_data_binance(common_symbols)))
-print(get_data_bybit(common_symbols), get_data_bybit(common_symbols))
+a = {'BTC', 'ETH'}
+b = {'SOL', 'ETH'}
+c = a & b
+print(c)
+binance_data = get_data_binance(common_symbols)  # <class 'dict'>
+bybit_data = get_data_bybit(common_symbols)  # <class 'dict'>
+# print(get_binance_symbol(), len(get_binance_symbol()))
+# print(get_bybit_symbol(), len(get_bybit_symbol()))
+print(common_symbols, len(comparison_symbols(binance, bybit)))
+print(binance_data, len(binance_data))
+print(bybit_data, len(bybit_data))
 # try:
 #     def get_binance_futures_usdt():
 #         # Bid / Ask - берем для порівняння ф'ючерсів
