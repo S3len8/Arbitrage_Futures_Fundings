@@ -10,7 +10,7 @@ def get_better_funding(binance: dict, bybit: dict) -> dict:
             print(f'{key} ❌ нет данных')
             continue
 
-        if -0.1 <= funding_A >= 0.1 or -0.1 <= funding_B >= 0.1:
+        if (0.1 >= funding_A and -0.1 >= funding_A) or (0.1 >= funding_B and -0.1 >= funding_B):
             result[key] = {
                 'binance': binance[key],
                 'bybit': bybit[key],
