@@ -107,7 +107,7 @@ def get_data_bybit(common_symbols: list[str]) -> dict:
 
 binance_data = get_data_binance(common_symbols)  # <class 'dict'>
 bybit_data = get_data_bybit(common_symbols)  # <class 'dict'>
-coins_after_comparison = set(common_symbols) & binance_data.keys()  # Need for get real same symbols from Binance and Bybit
+coins_after_comparison = set(common_symbols) & binance_data.keys()  # Need for get real same symbols from Binance and Bybit <class 'set'>
 # print(coins_after_comparison, len(coins_after_comparison))
 # print(get_binance_symbol(), len(get_binance_symbol()))
 # print(get_bybit_symbol(), len(get_bybit_symbol()))
