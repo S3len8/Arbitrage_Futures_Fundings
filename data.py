@@ -112,8 +112,8 @@ coins_after_comparison = set(common_symbols) & binance_data.keys()  # Need for g
 # print(get_binance_symbol(), len(get_binance_symbol()))
 # print(get_bybit_symbol(), len(get_bybit_symbol()))
 # print(common_symbols, len(comparison_symbols(binance, bybit)))
-print(binance_data, len(binance_data))
-print(bybit_data, len(bybit_data))
+# print(binance_data, len(binance_data))
+# print(bybit_data, len(bybit_data))
 # print(bybit_data.keys() - binance_data.keys())
 # try:
 #     def get_binance_futures_usdt():
