@@ -1,9 +1,16 @@
 import requests
+import time
+import hmac
+import hashlib
+from urllib.parse import urlencode
 
+API_KEY = 'OcirhzEKhIgPDd9wcV0fOTaMMoVBq3mLY8ESmEFZXcZ53doPfPIgsSZMZVz74bSy'
+API_SECRET = 'jvYQuPuM26KLvY3M67FlYtAZpCHLTf7Hc3qBhs7Ch5DPx6mxQ7mqDCwZnMywm1Sf'
 
 BINANCE_ORDER_BOOK = 'https://fapi.binance.com/fapi/v1/ticker/bookTicker'
 BINANCE_DATA = 'https://fapi.binance.com/fapi/v1/ticker/24hr'
 BINANCE_FUNDING = 'https://fapi.binance.com/fapi/v1/premiumIndex'
+BINANCE_FEES = 'https://fapi.binance.com/fapi/v1/commissionRate'
 
 BYBIT_DATA = 'https://api.bybit.com/v5/market/tickers'
 
@@ -108,6 +115,35 @@ def get_data_bybit(common_symbols: list[str]) -> dict:
 binance_data = get_data_binance(common_symbols)  # <class 'dict'>
 bybit_data = get_data_bybit(common_symbols)  # <class 'dict'>
 coins_after_comparison = set(common_symbols) & binance_data.keys()  # Need for get real same symbols from Binance and Bybit <class 'set'>
+# def get_fees_binance(symbol):  # {'symbol': 'BTCUSDT', 'makerCommissionRate': '0.000200', 'takerCommissionRate': '0.000500', 'rpiCommissionRate': '0'}
+#     params = {
+#         'symbol': symbol,
+#         'timestamp': int(time.time() * 1000)
+#     }
+#
+#     query = urlencode(params)
+#     signature = hmac.new(
+#         API_SECRET.encode(),
+#         query.encode(),
+#         hashlib.sha256
+#     ).hexdigest()
+#
+#     params['signature'] = signature
+#
+#     headers = {
+#         'X-MBX-APIKEY': API_KEY
+#     }
+#
+#     r = requests.get(
+#         BINANCE_FEES,
+#         headers=headers,
+#         params=params
+#     )
+#
+#     return r.json()
+#
+#
+# print(get_fees_binance('BTCUSDT'))
 # print(coins_after_comparison, len(coins_after_comparison))
 # print(get_binance_symbol(), len(get_binance_symbol()))
 # print(get_bybit_symbol(), len(get_bybit_symbol()))
