@@ -26,35 +26,25 @@ for symbol, data in funding.items():
     print(symbol, data['funding Binance:'], data['funding Bybit:'])
 
 
-def middle_price_binance(binance: dict):
+def middle_price_exchanges(binance: dict, bybit: dict):
     result = {}
-    for symbol in binance:
-        ask = binance[symbol]['ask']
-        bid = binance[symbol]['bid']
+    exchanges_data = binance.keys() & bybit.keys()
+    for symbol in exchanges_data:
+        askBinance = binance[symbol]['ask']
+        bidBinance = binance[symbol]['bid']
+        askBybit = bybit[symbol]['ask']
+        bidBybit = bybit[symbol]['bid']
         if symbol in funding:
+            middle_price = (askBinance + bidBinance + askBybit + bidBybit) / 4
             result[symbol] = {
-                'exchange': 'Binance',
                 'symbol': symbol,
-                'ask': float(ask),
-                'bid': float(bid),
+                'askBinance': float(askBinance),
+                'bidBinance': float(bidBinance),
+                'askBybit': float(askBybit),
+                'bidBybit': float(bidBybit),
+                'middle price': float(middle_price),
             }
     return result
 
 
-def middle_price_bybit(bybit: dict):
-    result = {}
-    for symbol in bybit:
-        ask = bybit[symbol]['ask']
-        bid = bybit[symbol]['bid']
-        if symbol in funding:
-            result[symbol] = {
-                'exchange': 'Bybit',
-                'symbol': symbol,
-                'ask': float(ask),
-                'bid': float(bid),
-            }
-    return result
-
-
-print(middle_price_binance(binance_data))
-print(middle_price_bybit(bybit_data))
+print(middle_price_exchanges(binance_data, bybit_data))
