@@ -1,4 +1,4 @@
-from data import binance_data, bybit_data, coins_after_comparison
+from data import binance_data, bybit_data, coins_after_comparison, FEES
 
 
 # Function get funding from binance and bybit in set coins_after_comparison
@@ -47,4 +47,7 @@ def middle_price_exchanges(binance: dict, bybit: dict):
     return result
 
 
+# def get_fees():
+#     for symbol in FEES:
+#         feeA = symbol['']
 print(middle_price_exchanges(binance_data, bybit_data))
