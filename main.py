@@ -21,13 +21,9 @@ def get_better_funding(binance: dict, bybit: dict) -> dict:
     return result
 
 
-funding = get_better_funding(binance_data, bybit_data)
+funding = get_better_funding(binance_data, bybit_data)  # <class 'dict'>
 for symbol, data in funding.items():
     print(symbol, data['funding Binance:'], data['funding Bybit:'])
-
-
-print(type(binance_data))
-print(binance_data)
 
 
 def middle_price_binance(binance: dict):
@@ -36,8 +32,8 @@ def middle_price_binance(binance: dict):
         ask = binance[symbol]['ask']
         bid = binance[symbol]['bid']
         if symbol in funding:
-            result = {
-                'binance: ': 'Binance',
+            result[symbol] = {
+                'exchange': 'Binance',
                 'symbol': symbol,
                 'ask': float(ask),
                 'bid': float(bid),
@@ -51,8 +47,8 @@ def middle_price_bybit(bybit: dict):
         ask = bybit[symbol]['ask']
         bid = bybit[symbol]['bid']
         if symbol in funding:
-            result = {
-                'binance: ': 'Bybit',
+            result[symbol] = {
+                'exchange': 'Bybit',
                 'symbol': symbol,
                 'ask': float(ask),
                 'bid': float(bid),
