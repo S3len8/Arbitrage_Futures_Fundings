@@ -47,7 +47,17 @@ def middle_price_exchanges(binance: dict, bybit: dict):
     return result
 
 
-# def get_fees():
-#     for symbol in FEES:
-#         feeA = symbol['']
+def get_fees():
+    result = {}
+    for symbol in FEES:
+        if symbol in funding['exchanges']:
+            feeA = symbol['']
+            feeB = symbol['']
+            result = {
+                'exchange:': symbol,
+                'fee': symbol['']
+            }
+    return result
+
+
 print(middle_price_exchanges(binance_data, bybit_data))
