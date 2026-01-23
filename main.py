@@ -25,33 +25,28 @@ for symbol, data in funding.items():
     print(symbol, data['binance'], data['bybit'])
 
 
-def get_better_funding(binance: dict, bybit: dict) -> dict:
+def get_better_funding():
     result = {}
-    for key in coins_after_comparison:
-        funding_A = (binance[key]['funding']) * 100  # Getting and calculation funding in percent from Binance
-        funding_B = (bybit[key]['funding']) * 100  # Getting and calculation funding in percent from Bybit
-        funding = {
+    for key in funding:
+        funding_A = (funding[key]['binance'])  # Getting and calculation funding in percent from Binance
+        funding_B = (funding[key]['bybit'])  # Getting and calculation funding in percent from Bybit
+        funding_dict = {
             'Binance': funding_A,
             'Bybit': funding_B,
         }
-        bigger_funding = max(funding, key=lambda k: abs(funding[k]))
-        if not funding_A or not funding_B:
-            print(f'{key} ❌ нет данных')
-            continue
-        # Filter for getting necessary funding percent from exchanges
-        if (0.1 >= funding_A and -0.1 >= funding_A) or (0.1 >= funding_B and -0.1 >= funding_B):
-            if bigger_funding == 'Binance':  # Check bigger funding
-                result[key] = {
-                    'bigger funding': funding_A,
-                }
-            elif bigger_funding == 'Bybit':  # Next can add same if for each exchange
-                result[key] = {
-                    'bigger funding': funding_B,
-                }
+        bigger_funding = max(funding_dict, key=lambda k: abs(funding_dict[k]))
+        if bigger_funding == 'Binance':  # Check bigger funding
+            result[key] = {
+                'Binance funding': funding_A,
+            }
+        elif bigger_funding == 'Bybit':  # Next can add same if for each exchange
+            result[key] = {
+                'Bybit funding': funding_B,
+            }
     return result
 
 
-better_funding = get_better_funding(binance_data, bybit_data)  # <class 'dict'>
+better_funding = get_better_funding()  # <class 'dict'>
 print(better_funding)
 
 
