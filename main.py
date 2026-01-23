@@ -94,14 +94,17 @@ def exit_spread():
 
 print(entry_spread())
 print(exit_spread())
-# def get_fees():
-#     result = {}
-#     for symbol in FEES:
-#         if symbol in funding['exchanges']:
-#             feeA = symbol['']
-#             feeB = symbol['']
-#             result = {
-#                 'exchange:': symbol,
-#                 'fee': symbol['']
-#             }
-#     return result
+
+
+# This function must calculation fees from two exchanges, like Binance/Bybit, MEXC/Bitget or something like this
+def get_fees():
+    result = {}
+    for exchange, key in FEES.items():  # Get exchange fees and after get maker/taker fee
+        result[exchange] = {
+            'maker fee': key['maker:'],
+            'taker fee': key['taker:'],
+        }
+    return result
+
+
+print(get_fees())
