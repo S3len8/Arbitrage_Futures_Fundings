@@ -13,17 +13,16 @@ def get_better_funding(binance: dict, bybit: dict) -> dict:
         # Filter for getting necessary funding percent from exchanges
         if (0.1 >= funding_A and -0.1 >= funding_A) or (0.1 >= funding_B and -0.1 >= funding_B):
             result[key] = {
-                'binance': binance[key],
-                'bybit': bybit[key],
-                'funding Binance:': funding_A,
-                'funding Bybit:': funding_B,
+                'binance': funding_A,
+                'bybit': funding_B,
             }
     return result
 
 
 funding = get_better_funding(binance_data, bybit_data)  # <class 'dict'>
+print(funding)
 for symbol, data in funding.items():
-    print(symbol, data['funding Binance:'], data['funding Bybit:'])
+    print(symbol, data['binance'], data['bybit'])
 
 
 def middle_price_exchanges(binance: dict, bybit: dict):
@@ -47,17 +46,22 @@ def middle_price_exchanges(binance: dict, bybit: dict):
     return result
 
 
-def get_fees():
-    result = {}
-    for symbol in FEES:
-        if symbol in funding['exchanges']:
-            feeA = symbol['']
-            feeB = symbol['']
-            result = {
-                'exchange:': symbol,
-                'fee': symbol['']
-            }
-    return result
+middle_price = middle_price_exchanges(binance_data, bybit_data)
+print(middle_price)
 
 
-print(middle_price_exchanges(binance_data, bybit_data))
+# def entry_spread():
+#     result = {}
+#     for key in funding:
+#
+# def get_fees():
+#     result = {}
+#     for symbol in FEES:
+#         if symbol in funding['exchanges']:
+#             feeA = symbol['']
+#             feeB = symbol['']
+#             result = {
+#                 'exchange:': symbol,
+#                 'fee': symbol['']
+#             }
+#     return result
