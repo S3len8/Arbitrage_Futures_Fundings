@@ -12,13 +12,13 @@ def get_better_funding(binance: dict, bybit: dict) -> dict:
             continue
         # Filter for getting necessary funding percent from exchanges
         if (0.1 >= funding_A and -0.1 >= funding_A) or (0.1 >= funding_B and -0.1 >= funding_B):
-            if abs(funding_A) > abs(funding_B):
+            if abs(funding_A) > abs(funding_B):  # Check bigger funding
                 result[key] = {
                     'binance': funding_A,
                     'bybit': funding_B,
                     'bigger funding': funding_A,
                 }
-            elif abs(funding_B) > abs(funding_A):
+            elif abs(funding_B) > abs(funding_A):  # Next can add same if for each exchange
                 result[key] = {
                     'binance': funding_A,
                     'bybit': funding_B,
@@ -35,13 +35,13 @@ for symbol, data in funding.items():
 
 def middle_price_exchanges(binance: dict, bybit: dict):
     result = {}
-    exchanges_data = binance.keys() & bybit.keys()
-    for symbol in exchanges_data:
+    exchanges_data = binance.keys() & bybit.keys()  # Unite keys from exchanges <class 'set'>
+    for symbol in exchanges_data:  # Get symbols from data
         askBinance = binance[symbol]['ask']
         bidBinance = binance[symbol]['bid']
         askBybit = bybit[symbol]['ask']
         bidBybit = bybit[symbol]['bid']
-        if symbol in funding:
+        if symbol in funding:  # Checking availability symbols in funding
             middle_price = (askBinance + bidBinance + askBybit + bidBybit) / 4
             result[symbol] = {
                 'symbol': symbol,
