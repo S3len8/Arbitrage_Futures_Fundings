@@ -12,10 +12,18 @@ def get_better_funding(binance: dict, bybit: dict) -> dict:
             continue
         # Filter for getting necessary funding percent from exchanges
         if (0.1 >= funding_A and -0.1 >= funding_A) or (0.1 >= funding_B and -0.1 >= funding_B):
-            result[key] = {
-                'binance': funding_A,
-                'bybit': funding_B,
-            }
+            if abs(funding_A) > abs(funding_B):
+                result[key] = {
+                    'binance': funding_A,
+                    'bybit': funding_B,
+                    'bigger funding': funding_A,
+                }
+            elif abs(funding_B) > abs(funding_A):
+                result[key] = {
+                    'binance': funding_A,
+                    'bybit': funding_B,
+                    'bigger funding': funding_B,
+                }
     return result
 
 
