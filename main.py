@@ -67,7 +67,25 @@ def entry_spread():
     return result
 
 
+def exit_spread():
+    result = {}
+    for symbol in funding:
+        funding_A = funding[symbol]['binance']
+        funding_B = funding[symbol]['bybit']
+        ask_A = float(middle_price[symbol]['askBinance'])
+        bid_A = float(middle_price[symbol]['bidBinance'])
+        ask_B = float(middle_price[symbol]['askBybit'])
+        bid_B = float(middle_price[symbol]['bidBybit'])
+        middle_price_A = middle_price[symbol]['middle price']
+        if funding_A > 0:
+            result[symbol] = ((bid_A - ask_B) / middle_price_A) * 100
+        elif funding_A < 0:
+            result[symbol] = ((bid_B - ask_A) / middle_price_A) * 100
+    return result
+
+
 print(entry_spread())
+print(exit_spread())
 # def get_fees():
 #     result = {}
 #     for symbol in FEES:
