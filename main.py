@@ -7,18 +7,23 @@ def get_better_funding(binance: dict, bybit: dict) -> dict:
     for key in coins_after_comparison:
         funding_A = (binance[key]['funding']) * 100  # Getting and calculation funding in percent from Binance
         funding_B = (bybit[key]['funding']) * 100  # Getting and calculation funding in percent from Bybit
+        funding = {
+            'Binance': funding_A,
+            'Bybit': funding_B,
+        }
+        bigger_funding = max(funding, key=lambda k: abs(funding[k]))
         if not funding_A or not funding_B:
             print(f'{key} ❌ нет данных')
             continue
         # Filter for getting necessary funding percent from exchanges
         if (0.1 >= funding_A and -0.1 >= funding_A) or (0.1 >= funding_B and -0.1 >= funding_B):
-            if abs(funding_A) > abs(funding_B):  # Check bigger funding
+            if bigger_funding == 'Binance':  # Check bigger funding
                 result[key] = {
                     'binance': funding_A,
                     'bybit': funding_B,
                     'bigger funding': funding_A,
                 }
-            elif abs(funding_B) > abs(funding_A):  # Next can add same if for each exchange
+            elif bigger_funding == 'Bybit':  # Next can add same if for each exchange
                 result[key] = {
                     'binance': funding_A,
                     'bybit': funding_B,
