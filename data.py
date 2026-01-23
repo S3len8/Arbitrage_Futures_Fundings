@@ -15,18 +15,30 @@ BINANCE_FEES = 'https://fapi.binance.com/fapi/v1/commissionRate'
 BYBIT_DATA = 'https://api.bybit.com/v5/market/tickers'
 
 FEES = {
-    'Binance maker:': 0.0002,
-    'Binance taker:': 0.0005,
-    'Bybit maker:': 0.00036,
-    'Bybit taker:': 0.001,
-    'Bitget maker:': 0.0002,
-    'Bitget taker:': 0.0006,
-    'MEXC maker:': 0.0001,
-    'MEXC taker:': 0.0004,
-    'Gate maker:': 0.0002,
-    'Gate taker:': 0.0005,
-    'Kucoin maker:': 0.0002,
-    'Kucoin taker:': 0.0006,
+    'Binance': {
+        'Binance maker:': 0.0002,
+        'Binance taker:': 0.0005,
+    },
+    'Bybit': {
+        'Bybit maker:': 0.00036,
+        'Bybit taker:': 0.001,
+    },
+    'Bitget': {
+        'Bitget maker:': 0.0002,
+        'Bitget taker:': 0.0006,
+    },
+    'MEXC': {
+        'MEXC maker:': 0.0001,
+        'MEXC taker:': 0.0004,
+    },
+    'Gate': {
+        'Gate maker:': 0.0002,
+        'Gate taker:': 0.0005,
+    },
+    'Kucoin': {
+        'Kucoin maker:': 0.0002,
+        'Kucoin taker:': 0.0006,
+    },
 }
 
 
