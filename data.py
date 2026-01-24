@@ -92,6 +92,10 @@ bitget = get_bitget_symbol()
 print(bitget)
 
 
+def normalize(symbol: str) -> str:
+    return symbol.replace('USDT', '').replace('USDT', '')
+
+
 # Function for comparison symbols
 def comparison_symbols(binance: list, bybit: list) -> list:
     binance_symbol = {item['symbol'] for item in binance}
