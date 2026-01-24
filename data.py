@@ -14,7 +14,7 @@ BINANCE_FEES = 'https://fapi.binance.com/fapi/v1/commissionRate'
 
 BYBIT_DATA = 'https://api.bybit.com/v5/market/tickers'
 
-BITGET = 'https://api.bitget.com/api/v2/mix/market/tickers?productType=COIN-FUTURES'
+BITGET = 'https://api.bitget.com/api/v2/mix/market/tickers'
 
 FEES = {
     'Binance': {
@@ -74,7 +74,8 @@ def get_bybit_symbol():
 
 
 def get_bitget_symbol():
-    data = requests.get(BITGET).json()
+    params = {"productType": "USDT-FUTURES"}
+    data = requests.get(BITGET, params=params).json()
     result = []
     for symbol in data['data']:
         result.append({
@@ -92,22 +93,23 @@ bitget = get_bitget_symbol()
 print(bitget)
 
 
-# def normalize(symbol: str) -> str:
-#     return symbol.replace('USDT', '').replace('USDT', '')
-#
-#
-# # Function for comparison symbols
-# def comparison_symbols(binance: list, bybit: list) -> list:
-#     binance_symbol = {item['symbol'] for item in binance}
-#     bybit_symbol = {item['symbol'] for item in bybit}
-#     # bitget_symbol = {item['symbol'] for item in bitget}
-#     sets = [binance_symbol, bybit_symbol]
-#
-#     return list(set.intersection(*sets))
-#
-#
-# common_symbols = comparison_symbols(binance=binance, bybit=bybit)  # <class 'list'>
-# print(common_symbols)
+def normalize(symbol: str) -> str:
+    return symbol.replace('USDT', '').replace('USD', '')
+
+
+# Function for comparison symbols
+def comparison_symbols(binance: list, bybit: list, bitget: list) -> list:
+    binance_symbol = {normalize(item['symbol']) for item in binance}
+    bybit_symbol = {normalize(item['symbol']) for item in bybit}
+    bitget_symbol = {normalize(item['symbol']) for item in bitget}
+    sets = [binance_symbol, bybit_symbol, bitget_symbol]
+
+    return list(set.intersection(*sets))
+
+
+common_symbols = comparison_symbols(binance=binance, bybit=bybit, bitget=bitget)  # <class 'list'>
+print(common_symbols)  # ['INJ', 'NIL', 'DEXE', 'PTB', 'REZ', 'CHZ', 'BANANA', 'ANIME', 'ANKR', 'FLUID', 'RENDER', 'C98', 'BLUAI', 'CTK', 'PIPPIN', 'GMX', 'LINEA', 'EVAA', 'COOKIE', 'MYX', 'ENJ',
+
 
 def get_funding_binance() -> dict:
     result = {}
@@ -146,6 +148,7 @@ def get_funding_bitget():
             'funding': float(t['fundingRate'])
         }
     return result
+
 
 binance_funding = get_funding_binance()
 bybit_funding = get_funding_bybit()
