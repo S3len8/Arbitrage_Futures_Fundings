@@ -14,6 +14,8 @@ BINANCE_FEES = 'https://fapi.binance.com/fapi/v1/commissionRate'
 
 BYBIT_DATA = 'https://api.bybit.com/v5/market/tickers'
 
+BITGET = 'https://api.bitget.com/api/v2/mix/market/tickers?productType=COIN-FUTURES'
+
 FEES = {
     'Binance': {
         'maker:': 0.0002,
@@ -71,18 +73,37 @@ def get_bybit_symbol():
     return result
 
 
+def get_bitget_symbol():
+    data = requests.get(BITGET).json()
+    result = []
+    for symbol in data['data']:
+        result.append({
+            'symbol': symbol['symbol']
+        })
+
+    return result
+
+
 binance = get_binance_symbol()
+print(binance)
 bybit = get_bybit_symbol()
+print(bybit)
+bitget = get_bitget_symbol()
+print(bitget)
 
 
 # Function for comparison symbols
 def comparison_symbols(binance: list, bybit: list) -> list:
     binance_symbol = {item['symbol'] for item in binance}
     bybit_symbol = {item['symbol'] for item in bybit}
-    return list(binance_symbol & bybit_symbol)
+    # bitget_symbol = {item['symbol'] for item in bitget}
+    sets = [binance_symbol, bybit_symbol]
+
+    return list(set.intersection(*sets))
 
 
 common_symbols = comparison_symbols(binance=binance, bybit=bybit)  # <class 'list'>
+print(common_symbols)
 
 
 # Function for data binance
@@ -139,9 +160,30 @@ def get_data_bybit(common_symbols: list[str]) -> dict:
     return result
 
 
+def get_data_bitget(common_symbol: list[str]) -> dict:
+    symbols_set = set(common_symbol)
+    result = {}
+    k = requests.get(BITGET).json()
+    for t in k['data']:
+        symbol = t['symbol']
+        if symbol not in symbols_set:
+            continue
+
+        result[symbol] = {
+            'bid': float(t['bidPr']),
+            'ask': float(t['askPr']),
+            'volume 24H': float(t['usdtVolume']),
+            'funding': float(t['fundingRate'])
+        }
+    return result
+
+
 binance_data = get_data_binance(common_symbols)  # <class 'dict'>
 bybit_data = get_data_bybit(common_symbols)  # <class 'dict'>
+print(bybit_data)
+# bitget_data = get_data_bitget(common_symbols)  # <class 'dict'>
 coins_after_comparison = set(common_symbols) & binance_data.keys()  # Need for get real same symbols from Binance and Bybit <class 'set'>
+
 # def get_fees_binance(symbol):  # {'symbol': 'BTCUSDT', 'makerCommissionRate': '0.000200', 'takerCommissionRate': '0.000500', 'rpiCommissionRate': '0'}
 #     params = {
 #         'symbol': symbol,
