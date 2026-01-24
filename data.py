@@ -137,90 +137,104 @@ def get_funding_bybit():
 
 
 def get_funding_bitget():
-    pass
-
-
-print(get_funding_binance())  # Example print {'USDCUSDT': {'funding': 5.301e-05}, 'GRIFFAINUSDT': {'funding': 5e-05}, 'GMXUSDT': {'funding': 6.258e-05}, 'BANUSDT': {'funding': 5e-05}}
-print(get_funding_bybit())  # Example print {'0GUSDT': {'funding': -0.00062216}, '1000000BABYDOGEUSDT': {'funding': 5e-05}, '1000000CHEEMSUSDT': {'funding': 5e-05}, '1000000MOGUSDT': {'funding': -0.00065514}}
-
-
-# Function for data binance
-def get_data_binance() -> dict:
-    symbols_set = set(common_symbols)
-    result = {}
-    # Get volume
-    k = requests.get(BINANCE_DATA).json()
-    # Get funding
-    # v = requests.get(BINANCE_FUNDING).json()
-    # Get orderbook
-    q = requests.get(BINANCE_ORDER_BOOK).json()
-    # funding = {
-    #     f['symbol']: float(f['lastFundingRate'])
-    #     for f in v
-    #     if f['symbol'] in symbols_set
-    # }
-    volume = {
-        vol['symbol']: float(vol['quoteVolume'])
-        for vol in k
-        if vol['symbol'] in symbols_set
-    }
-    for t in q:
-        symbol = t['symbol']
-        if symbol not in symbols_set:
-            continue
-
-        result[symbol] = {
-            'bid': float(t['bidPrice']),
-            'ask': float(t['askPrice']),
-            'volume 24H': volume.get(symbol, 0.0),
-            # 'funding': funding.get(symbol, 0.0)
-        }
-    return result
-
-
-def get_data_bybit(common_symbols: list[str]) -> dict:
-    symbols_set = set(common_symbols)
-    result = {}
-    # Get data
-    k = requests.get(BYBIT_DATA, params={'category': 'linear'}).json()
-
-    for t in k['result']['list']:
-        symbol = t['symbol']
-        if symbol not in symbols_set:
-            continue
-
-        result[symbol] = {
-            'bid': float(t['bid1Price']),
-            'ask': float(t['ask1Price']),
-            'volume 24H': float(t['turnover24h']),
-            'funding': float(t['fundingRate'])
-        }
-    return result
-
-
-def get_data_bitget(common_symbol: list[str]) -> dict:
-    symbols_set = set(common_symbol)
     result = {}
     k = requests.get(BITGET).json()
     for t in k['data']:
         symbol = t['symbol']
-        if symbol not in symbols_set:
-            continue
 
         result[symbol] = {
-            'bid': float(t['bidPr']),
-            'ask': float(t['askPr']),
-            'volume 24H': float(t['usdtVolume']),
             'funding': float(t['fundingRate'])
         }
     return result
 
+binance_funding = get_funding_binance()
+bybit_funding = get_funding_bybit()
+bitget_funding = get_funding_bitget()
+print(binance_funding)  # Example print {'USDCUSDT': {'funding': 5.301e-05}, 'GRIFFAINUSDT': {'funding': 5e-05}, 'GMXUSDT': {'funding': 6.258e-05}, 'BANUSDT': {'funding': 5e-05}}
+print(bybit_funding)  # Example print {'0GUSDT': {'funding': -0.00062216}, '1000000BABYDOGEUSDT': {'funding': 5e-05}, '1000000CHEEMSUSDT': {'funding': 5e-05}, '1000000MOGUSDT': {'funding': -0.00065514}}
+print(bitget_funding)  # Example print {'BTCUSD': {'funding': 1.2e-05}, 'ETHUSD': {'funding': 0.0001}, 'XRPUSD': {'funding': 0.0001}, 'BCHUSD': {'funding': 0.0001}, 'LTCUSD': {'funding': -0.000133}}
+set_binance_bybit = set(binance_funding) & set(bybit_funding)
+all_symbols_funding = set_binance_bybit & bitget_funding.keys()
+print(all_symbols_funding)
 
-binance_data = get_data_binance(common_symbols)  # <class 'dict'>
-bybit_data = get_data_bybit(common_symbols)  # <class 'dict'>
-print(bybit_data)
-# bitget_data = get_data_bitget(common_symbols)  # <class 'dict'>
-coins_after_comparison = set(common_symbols) & binance_data.keys()  # Need for get real same symbols from Binance and Bybit <class 'set'>
+
+# # Function for data binance
+# def get_data_binance() -> dict:
+#     symbols_set = set(common_symbols)
+#     result = {}
+#     # Get volume
+#     k = requests.get(BINANCE_DATA).json()
+#     # Get funding
+#     # v = requests.get(BINANCE_FUNDING).json()
+#     # Get orderbook
+#     q = requests.get(BINANCE_ORDER_BOOK).json()
+#     # funding = {
+#     #     f['symbol']: float(f['lastFundingRate'])
+#     #     for f in v
+#     #     if f['symbol'] in symbols_set
+#     # }
+#     volume = {
+#         vol['symbol']: float(vol['quoteVolume'])
+#         for vol in k
+#         if vol['symbol'] in symbols_set
+#     }
+#     for t in q:
+#         symbol = t['symbol']
+#         if symbol not in symbols_set:
+#             continue
+#
+#         result[symbol] = {
+#             'bid': float(t['bidPrice']),
+#             'ask': float(t['askPrice']),
+#             'volume 24H': volume.get(symbol, 0.0),
+#             # 'funding': funding.get(symbol, 0.0)
+#         }
+#     return result
+#
+#
+# def get_data_bybit(common_symbols: list[str]) -> dict:
+#     symbols_set = set(common_symbols)
+#     result = {}
+#     # Get data
+#     k = requests.get(BYBIT_DATA, params={'category': 'linear'}).json()
+#
+#     for t in k['result']['list']:
+#         symbol = t['symbol']
+#         if symbol not in symbols_set:
+#             continue
+#
+#         result[symbol] = {
+#             'bid': float(t['bid1Price']),
+#             'ask': float(t['ask1Price']),
+#             'volume 24H': float(t['turnover24h']),
+#             # 'funding': float(t['fundingRate'])
+#         }
+#     return result
+#
+#
+# def get_data_bitget(common_symbol: list[str]) -> dict:
+#     symbols_set = set(common_symbol)
+#     result = {}
+#     k = requests.get(BITGET).json()
+#     for t in k['data']:
+#         symbol = t['symbol']
+#         if symbol not in symbols_set:
+#             continue
+#
+#         result[symbol] = {
+#             'bid': float(t['bidPr']),
+#             'ask': float(t['askPr']),
+#             'volume 24H': float(t['usdtVolume']),
+#             'funding': float(t['fundingRate'])
+#         }
+#     return result
+#
+#
+# binance_data = get_data_binance(common_symbols)  # <class 'dict'>
+# bybit_data = get_data_bybit(common_symbols)  # <class 'dict'>
+# print(bybit_data)
+# # bitget_data = get_data_bitget(common_symbols)  # <class 'dict'>
+# coins_after_comparison = set(common_symbols) & binance_data.keys()  # Need for get real same symbols from Binance and Bybit <class 'set'>
 
 # def get_fees_binance(symbol):  # {'symbol': 'BTCUSDT', 'makerCommissionRate': '0.000200', 'takerCommissionRate': '0.000500', 'rpiCommissionRate': '0'}
 #     params = {
