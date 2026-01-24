@@ -92,26 +92,48 @@ bitget = get_bitget_symbol()
 print(bitget)
 
 
-def normalize(symbol: str) -> str:
-    return symbol.replace('USDT', '').replace('USDT', '')
+# def normalize(symbol: str) -> str:
+#     return symbol.replace('USDT', '').replace('USDT', '')
+#
+#
+# # Function for comparison symbols
+# def comparison_symbols(binance: list, bybit: list) -> list:
+#     binance_symbol = {item['symbol'] for item in binance}
+#     bybit_symbol = {item['symbol'] for item in bybit}
+#     # bitget_symbol = {item['symbol'] for item in bitget}
+#     sets = [binance_symbol, bybit_symbol]
+#
+#     return list(set.intersection(*sets))
+#
+#
+# common_symbols = comparison_symbols(binance=binance, bybit=bybit)  # <class 'list'>
+# print(common_symbols)
+
+def get_funding_binance() -> dict:
+    result = {}
+    # Get funding
+    v = requests.get(BINANCE_FUNDING).json()
+    for key in v:
+        symbol = key['symbol']
+        result[symbol] = {
+            'funding': float(key['lastFundingRate']),
+        }
+    return result
 
 
-# Function for comparison symbols
-def comparison_symbols(binance: list, bybit: list) -> list:
-    binance_symbol = {item['symbol'] for item in binance}
-    bybit_symbol = {item['symbol'] for item in bybit}
-    # bitget_symbol = {item['symbol'] for item in bitget}
-    sets = [binance_symbol, bybit_symbol]
-
-    return list(set.intersection(*sets))
+print(get_funding_binance())  # Example print {'USDCUSDT': {'funding': 5.301e-05}, 'GRIFFAINUSDT': {'funding': 5e-05}, 'GMXUSDT': {'funding': 6.258e-05}, 'BANUSDT': {'funding': 5e-05}}
 
 
-common_symbols = comparison_symbols(binance=binance, bybit=bybit)  # <class 'list'>
-print(common_symbols)
+def get_funding_bybit():
+    pass
+
+
+def get_funding_bitget():
+    pass
 
 
 # Function for data binance
-def get_data_binance(common_symbols: list[str]) -> dict:
+def get_data_binance() -> dict:
     symbols_set = set(common_symbols)
     result = {}
     # Get volume
