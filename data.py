@@ -121,15 +121,27 @@ def get_funding_binance() -> dict:
     return result
 
 
-print(get_funding_binance())  # Example print {'USDCUSDT': {'funding': 5.301e-05}, 'GRIFFAINUSDT': {'funding': 5e-05}, 'GMXUSDT': {'funding': 6.258e-05}, 'BANUSDT': {'funding': 5e-05}}
-
-
 def get_funding_bybit():
-    pass
+    result = {}
+    # Get data
+    k = requests.get(BYBIT_DATA, params={'category': 'linear'}).json()
+    for t in k['result']['list']:
+        symbol = t['symbol']
+        funding_raw = t.get('fundingRate')  # Need for getting all symbols with and without funding
+
+        if funding_raw not in ('', None):
+            result[symbol] = {
+                'funding': float(funding_raw)
+            }
+    return result
 
 
 def get_funding_bitget():
     pass
+
+
+print(get_funding_binance())  # Example print {'USDCUSDT': {'funding': 5.301e-05}, 'GRIFFAINUSDT': {'funding': 5e-05}, 'GMXUSDT': {'funding': 6.258e-05}, 'BANUSDT': {'funding': 5e-05}}
+print(get_funding_bybit())  # Example print {'0GUSDT': {'funding': -0.00062216}, '1000000BABYDOGEUSDT': {'funding': 5e-05}, '1000000CHEEMSUSDT': {'funding': 5e-05}, '1000000MOGUSDT': {'funding': -0.00065514}}
 
 
 # Function for data binance
@@ -139,14 +151,14 @@ def get_data_binance() -> dict:
     # Get volume
     k = requests.get(BINANCE_DATA).json()
     # Get funding
-    v = requests.get(BINANCE_FUNDING).json()
+    # v = requests.get(BINANCE_FUNDING).json()
     # Get orderbook
     q = requests.get(BINANCE_ORDER_BOOK).json()
-    funding = {
-        f['symbol']: float(f['lastFundingRate'])
-        for f in v
-        if f['symbol'] in symbols_set
-    }
+    # funding = {
+    #     f['symbol']: float(f['lastFundingRate'])
+    #     for f in v
+    #     if f['symbol'] in symbols_set
+    # }
     volume = {
         vol['symbol']: float(vol['quoteVolume'])
         for vol in k
@@ -161,7 +173,7 @@ def get_data_binance() -> dict:
             'bid': float(t['bidPrice']),
             'ask': float(t['askPrice']),
             'volume 24H': volume.get(symbol, 0.0),
-            'funding': funding.get(symbol, 0.0)
+            # 'funding': funding.get(symbol, 0.0)
         }
     return result
 
