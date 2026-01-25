@@ -174,8 +174,8 @@ bitget_funding = get_funding_bitget()   # Example print {'BTCUSD': {'funding': 1
 print(binance_funding)
 print(bybit_funding)
 print(bitget_funding)
-set_all_symbols_funding = [set(binance_funding), set(bybit_funding), set(bitget_funding)]
-print(set().union(*set_all_symbols_funding), len(set().union(*set_all_symbols_funding)))
+set_all_symbols_funding = set().union(binance_funding, bybit_funding, bitget_funding)
+print(set_all_symbols_funding, len(set_all_symbols_funding))
 
 
 # # Function for data binance

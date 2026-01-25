@@ -1,13 +1,17 @@
-from data import FEES, all_symbols_funding, binance_funding, bybit_funding
+from data import FEES, set_all_symbols_funding, binance_funding, bybit_funding, bitget_funding
 
 
 # Function get funding from binance and bybit in set coins_after_comparison
-def get_funding(binance: dict, bybit: dict) -> dict:
+def get_funding(binance: dict, bybit: dict, bitget: dict) -> dict:
     result = {}  # <class 'dict'>
-    for key in all_symbols_funding:
+    for key in set_all_symbols_funding:
+        if key not in binance or key not in bybit or key not in bitget:
+            print(f'{key} ❌ нет данных')
+            continue
         funding_A = (binance[key]['funding']) * 100  # Getting and calculation funding in percent from Binance
         funding_B = (bybit[key]['funding']) * 100  # Getting and calculation funding in percent from Bybit
-        if not funding_A or not funding_B:
+        funding_C = (bitget[key]['funding']) * 100
+        if not funding_A or not funding_B or not funding_C:
             print(f'{key} ❌ нет данных')
             continue
         # Filter for getting necessary funding percent from exchanges
@@ -19,7 +23,7 @@ def get_funding(binance: dict, bybit: dict) -> dict:
     return result
 
 
-funding = get_funding(binance_funding, bybit_funding)  # <class 'dict'>
+funding = get_funding(binance_funding, bybit_funding, bitget_funding)  # <class 'dict'>
 print(funding)
 for symbol, data in funding.items():
     print(symbol, data['binance'], data['bybit'])
