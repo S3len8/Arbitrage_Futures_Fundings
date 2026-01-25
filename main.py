@@ -3,33 +3,41 @@ from data import FEES, set_all_symbols_funding, binance_funding, bybit_funding, 
 
 # Function get funding from binance and bybit in set coins_after_comparison
 def get_funding(binance: dict, bybit: dict, bitget: dict) -> dict:
-    result = {}  # <class 'dict'>
-    for key in set_all_symbols_funding:
-        if key not in binance or key not in bybit or key not in bitget:
-            # print(f'{key} ❌ нет данных')
+    result = {
+        3: {},  # Coin in 3
+        2: {},  # Coin in 2
+        1: {},  # Coin in 1
+    }  # <class 'dict'>
+    for symbol in set_all_symbols_funding:
+        exchanges = {}
+        if symbol in binance and binance[symbol].get('funding') is not None:  # Getting and calculation funding in percent from Binance
+            funding = binance[symbol]['funding'] * 100
+            if -0.1 <= funding <= 0.1:  # Filter for getting necessary funding percent from exchanges
+                exchanges['binance'] = funding
+
+        if symbol in bybit and bybit[symbol].get('funding') is not None:  # Getting and calculation funding in percent from Bybit
+            funding = bybit[symbol]['funding'] * 100
+            if -0.1 <= funding <= 0.1:  # Filter for getting necessary funding percent from exchanges
+                exchanges['bybit'] = funding
+
+        if symbol in bitget and bitget[symbol].get('funding') is not None:  # Getting and calculation funding in percent from Bitget
+            funding = bitget[symbol]['funding'] * 100
+            if -0.1 <= funding <= 0.1:  # Filter for getting necessary funding percent from exchanges
+                exchanges['bitget'] = funding
+        count = len(exchanges)
+
+        if count == 0:
             continue
-        funding_A = (binance[key]['funding']) * 100  # Getting and calculation funding in percent from Binance
-        funding_B = (bybit[key]['funding']) * 100  # Getting and calculation funding in percent from Bybit
-        funding_C = (bitget[key]['funding']) * 100
-        if not funding_A or not funding_B or not funding_C:
-            print(f'{key} ❌ нет данных')
-            continue
-        # Filter for getting necessary funding percent from exchanges
-        if (0.1 >= funding_A and -0.1 >= funding_A) \
-                or (0.1 >= funding_B and -0.1 >= funding_B) \
-                or (0.1 >= funding_C and -0.1 >= funding_C):
-            result[key] = {
-                'binance': funding_A,
-                'bybit': funding_B,
-                'bitget': funding_C,
-            }
+
+        result[count][symbol] = exchanges
+
     return result
 
 
 funding = get_funding(binance_funding, bybit_funding, bitget_funding)  # <class 'dict'>
 print(funding)
-for symbol, data in funding.items():
-    print(symbol, data['binance'], data['bybit'], data['bitget'])
+# for symbol, data in funding.items():
+#     print(symbol, data['binance'], data['bybit'], data['bitget'])
 
 
 def get_better_funding():
