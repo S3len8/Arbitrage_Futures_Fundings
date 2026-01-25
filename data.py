@@ -109,10 +109,14 @@ print(common_symbols, len(common_symbols))  # ['INJ', 'NIL', 'DEXE', 'PTB', 'REZ
 
 
 def get_funding_binance() -> dict:
+    symbols_set = set(common_symbols)
     result = {}
     # Get funding
     v = requests.get(BINANCE_FUNDING).json()
     for key in v:
+        symbol = key['symbol']
+        if symbol not in symbols_set:
+            continue
         symbol = key['symbol']
         result[symbol] = {
             'funding': float(key['lastFundingRate']),
@@ -121,12 +125,15 @@ def get_funding_binance() -> dict:
 
 
 def get_funding_bybit():
+    symbols_set = set(common_symbols)
     result = {}
     # Get data
     k = requests.get(BYBIT_DATA, params={'category': 'linear'}).json()
     for t in k['result']['list']:
         symbol = t['symbol']
         funding_raw = t.get('fundingRate')  # Need for getting all symbols with and without funding
+        if symbol not in symbols_set:
+            continue
 
         if funding_raw not in ('', None):
             result[symbol] = {
@@ -136,11 +143,14 @@ def get_funding_bybit():
 
 
 def get_funding_bitget():
+    symbols_set = set(common_symbols)
     params = {"productType": "USDT-FUTURES"}
     result = {}
     k = requests.get(BITGET, params=params).json()
     for t in k['data']:
         symbol = t['symbol']
+        if symbol not in symbols_set:
+            continue
 
         result[symbol] = {
             'funding': float(t['fundingRate'])
