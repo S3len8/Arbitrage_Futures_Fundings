@@ -85,12 +85,9 @@ def get_bitget_symbol():
     return result
 
 
-binance = get_binance_symbol()
-print(binance)
-bybit = get_bybit_symbol()
-print(bybit)
-bitget = get_bitget_symbol()
-print(bitget)
+binance = get_binance_symbol()  # [{'symbol': 'BTCUSDT'}, {'symbol': 'ETHUSDT'}, {'symbol': 'BCHUSDT'}, {'symbol': 'XRPUSDT'}, {'symbol': 'LTCUSDT'}]
+bybit = get_bybit_symbol()  # [{'symbol': '0GUSDT'}, {'symbol': '1000000BABYDOGEUSDT'}, {'symbol': '1000000CHEEMSUSDT'}, {'symbol': '1000000MOGUSDT'}]
+bitget = get_bitget_symbol()  #  [{'symbol': 'BTCUSDT'}, {'symbol': 'ETHUSDT'}, {'symbol': 'XRPUSDT'}, {'symbol': 'BCHUSDT'}, {'symbol': 'LTCUSDT'}]
 
 
 def normalize(symbol: str) -> str:
@@ -104,11 +101,11 @@ def comparison_symbols(binance: list, bybit: list, bitget: list) -> list:
     bitget_symbol = {normalize(item['symbol']) for item in bitget}
     sets = [binance_symbol, bybit_symbol, bitget_symbol]
 
-    return list(set.intersection(*sets))
+    return list(set().union(*sets))
 
 
 common_symbols = comparison_symbols(binance=binance, bybit=bybit, bitget=bitget)  # <class 'list'>
-print(common_symbols)  # ['INJ', 'NIL', 'DEXE', 'PTB', 'REZ', 'CHZ', 'BANANA', 'ANIME', 'ANKR', 'FLUID', 'RENDER', 'C98', 'BLUAI', 'CTK', 'PIPPIN', 'GMX', 'LINEA', 'EVAA', 'COOKIE', 'MYX', 'ENJ',
+print(common_symbols, len(common_symbols))  # ['INJ', 'NIL', 'DEXE', 'PTB', 'REZ', 'CHZ', 'BANANA', 'ANIME', 'ANKR', 'FLUID', 'RENDER', 'C98', 'BLUAI', 'CTK', 'PIPPIN', 'GMX', 'LINEA', 'EVAA', 'COOKIE', 'MYX', 'ENJ',
 
 
 def get_funding_binance() -> dict:
@@ -139,8 +136,9 @@ def get_funding_bybit():
 
 
 def get_funding_bitget():
+    params = {"productType": "USDT-FUTURES"}
     result = {}
-    k = requests.get(BITGET).json()
+    k = requests.get(BITGET, params=params).json()
     for t in k['data']:
         symbol = t['symbol']
 
@@ -150,15 +148,9 @@ def get_funding_bitget():
     return result
 
 
-binance_funding = get_funding_binance()
-bybit_funding = get_funding_bybit()
-bitget_funding = get_funding_bitget()
-print(binance_funding)  # Example print {'USDCUSDT': {'funding': 5.301e-05}, 'GRIFFAINUSDT': {'funding': 5e-05}, 'GMXUSDT': {'funding': 6.258e-05}, 'BANUSDT': {'funding': 5e-05}}
-print(bybit_funding)  # Example print {'0GUSDT': {'funding': -0.00062216}, '1000000BABYDOGEUSDT': {'funding': 5e-05}, '1000000CHEEMSUSDT': {'funding': 5e-05}, '1000000MOGUSDT': {'funding': -0.00065514}}
-print(bitget_funding)  # Example print {'BTCUSD': {'funding': 1.2e-05}, 'ETHUSD': {'funding': 0.0001}, 'XRPUSD': {'funding': 0.0001}, 'BCHUSD': {'funding': 0.0001}, 'LTCUSD': {'funding': -0.000133}}
-set_binance_bybit = set(binance_funding) & set(bybit_funding)
-all_symbols_funding = set_binance_bybit & bitget_funding.keys()
-print(all_symbols_funding)
+binance_funding = get_funding_binance()  # Example print {'USDCUSDT': {'funding': 5.301e-05}, 'GRIFFAINUSDT': {'funding': 5e-05}, 'GMXUSDT': {'funding': 6.258e-05}, 'BANUSDT': {'funding': 5e-05}}
+bybit_funding = get_funding_bybit()  # Example print {'0GUSDT': {'funding': -0.00062216}, '1000000BABYDOGEUSDT': {'funding': 5e-05}, '1000000CHEEMSUSDT': {'funding': 5e-05}, '1000000MOGUSDT': {'funding': -0.00065514}}
+bitget_funding = get_funding_bitget()   # Example print {'BTCUSD': {'funding': 1.2e-05}, 'ETHUSD': {'funding': 0.0001}, 'XRPUSD': {'funding': 0.0001}, 'BCHUSD': {'funding': 0.0001}, 'LTCUSD': {'funding': -0.000133}}
 
 
 # # Function for data binance
