@@ -91,7 +91,7 @@ bitget = get_bitget_symbol()  #  [{'symbol': 'BTCUSDT'}, {'symbol': 'ETHUSDT'}, 
 
 
 def normalize(symbol: str) -> str:
-    return symbol.replace('USDT', '').replace('USD', '')
+    return symbol.replace('USDT', '').replace('USD', '').replace('PERP', '').replace('USDC', '')
 
 
 # Function for comparison symbols
@@ -115,7 +115,9 @@ def get_funding_binance() -> dict:
     v = requests.get(BINANCE_FUNDING).json()
     for key in v:
         symbol = key['symbol']
-        if symbol not in symbols_set:
+        if symbol.endswith('USDC'):
+            continue
+        if symbol in symbols_set:
             continue
         symbol = key['symbol']
         result[symbol] = {
@@ -132,7 +134,11 @@ def get_funding_bybit():
     for t in k['result']['list']:
         symbol = t['symbol']
         funding_raw = t.get('fundingRate')  # Need for getting all symbols with and without funding
-        if symbol not in symbols_set:
+        if symbol.endswith('PERP'):
+            continue
+        if symbol.endswith('USDC'):
+            continue
+        if symbol in symbols_set:
             continue
 
         if funding_raw not in ('', None):
@@ -149,7 +155,11 @@ def get_funding_bitget():
     k = requests.get(BITGET, params=params).json()
     for t in k['data']:
         symbol = t['symbol']
-        if symbol not in symbols_set:
+        if symbol.endswith('PERP'):
+            continue
+        if symbol.endswith('USDC'):
+            continue
+        if symbol in symbols_set:
             continue
 
         result[symbol] = {
@@ -161,6 +171,11 @@ def get_funding_bitget():
 binance_funding = get_funding_binance()  # Example print {'USDCUSDT': {'funding': 5.301e-05}, 'GRIFFAINUSDT': {'funding': 5e-05}, 'GMXUSDT': {'funding': 6.258e-05}, 'BANUSDT': {'funding': 5e-05}}
 bybit_funding = get_funding_bybit()  # Example print {'0GUSDT': {'funding': -0.00062216}, '1000000BABYDOGEUSDT': {'funding': 5e-05}, '1000000CHEEMSUSDT': {'funding': 5e-05}, '1000000MOGUSDT': {'funding': -0.00065514}}
 bitget_funding = get_funding_bitget()   # Example print {'BTCUSD': {'funding': 1.2e-05}, 'ETHUSD': {'funding': 0.0001}, 'XRPUSD': {'funding': 0.0001}, 'BCHUSD': {'funding': 0.0001}, 'LTCUSD': {'funding': -0.000133}}
+print(binance_funding)
+print(bybit_funding)
+print(bitget_funding)
+set_all_symbols_funding = [set(binance_funding), set(bybit_funding), set(bitget_funding)]
+print(set().union(*set_all_symbols_funding), len(set().union(*set_all_symbols_funding)))
 
 
 # # Function for data binance
