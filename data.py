@@ -105,7 +105,7 @@ def comparison_symbols(binance: list, bybit: list, bitget: list) -> list:
 
 
 common_symbols = comparison_symbols(binance=binance, bybit=bybit, bitget=bitget)  # <class 'list'>
-print(common_symbols, len(common_symbols))  # ['INJ', 'NIL', 'DEXE', 'PTB', 'REZ', 'CHZ', 'BANANA', 'ANIME', 'ANKR', 'FLUID', 'RENDER', 'C98', 'BLUAI', 'CTK', 'PIPPIN', 'GMX', 'LINEA', 'EVAA', 'COOKIE', 'MYX', 'ENJ',
+# print(common_symbols, len(common_symbols))  # ['INJ', 'NIL', 'DEXE', 'PTB', 'REZ', 'CHZ', 'BANANA', 'ANIME', 'ANKR', 'FLUID', 'RENDER', 'C98', 'BLUAI', 'CTK', 'PIPPIN', 'GMX', 'LINEA', 'EVAA', 'COOKIE', 'MYX', 'ENJ',
 
 
 def get_funding_binance() -> dict:
@@ -171,11 +171,11 @@ def get_funding_bitget():
 binance_funding = get_funding_binance()  # Example print {'USDCUSDT': {'funding': 5.301e-05}, 'GRIFFAINUSDT': {'funding': 5e-05}, 'GMXUSDT': {'funding': 6.258e-05}, 'BANUSDT': {'funding': 5e-05}}
 bybit_funding = get_funding_bybit()  # Example print {'0GUSDT': {'funding': -0.00062216}, '1000000BABYDOGEUSDT': {'funding': 5e-05}, '1000000CHEEMSUSDT': {'funding': 5e-05}, '1000000MOGUSDT': {'funding': -0.00065514}}
 bitget_funding = get_funding_bitget()   # Example print {'BTCUSD': {'funding': 1.2e-05}, 'ETHUSD': {'funding': 0.0001}, 'XRPUSD': {'funding': 0.0001}, 'BCHUSD': {'funding': 0.0001}, 'LTCUSD': {'funding': -0.000133}}
-print(binance_funding)
-print(bybit_funding)
-print(bitget_funding)
+# print(binance_funding)
+# print(bybit_funding)
+# print(bitget_funding)
 set_all_symbols_funding = set().union(binance_funding, bybit_funding, bitget_funding)
-print(set_all_symbols_funding, len(set_all_symbols_funding))
+# print(set_all_symbols_funding, len(set_all_symbols_funding))
 
 
 # # Function for data binance
