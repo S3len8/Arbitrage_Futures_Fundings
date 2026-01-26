@@ -20,6 +20,8 @@ MEXC = 'https://contract.mexc.com/api/v1/contract/ticker'
 
 KUCOIN = 'https://api-futures.kucoin.com/api/v1/contracts/active'
 
+GATE = 'https://api.gateio.ws/api/v4/futures/usdt/tickers'
+
 FEES = {
     'Binance': {
         'maker:': 0.0002,
@@ -106,7 +108,19 @@ def get_kucoin_symbol():
     for key in data['data']:
         symbol = key['symbol']
         result.append({
-            'symbol': symbol,
+            'symbol': symbol.replace('XBT', 'BTC').replace('USDTM', 'USDT'),
+        })
+
+    return result
+
+
+def get_gate_symbol():
+    result = []
+    data = requests.get(GATE).json()
+    for key in data:
+        symbol = key['contract']
+        result.append({
+            'symbol': symbol.replace('_', ''),
         })
 
     return result
@@ -117,26 +131,27 @@ bybit = get_bybit_symbol()  # [{'symbol': '0GUSDT'}, {'symbol': '1000000BABYDOGE
 bitget = get_bitget_symbol()  #  [{'symbol': 'BTCUSDT'}, {'symbol': 'ETHUSDT'}, {'symbol': 'XRPUSDT'}, {'symbol': 'BCHUSDT'}, {'symbol': 'LTCUSDT'}]
 mexc = get_mexc_symbol()  # [{'symbol': 'BTCUSDT'}, {'symbol': 'ETHUSDT'}, {'symbol': 'SOLUSDT'}, {'symbol': 'RIVERUSDT'}, {'symbol': 'XAUTUSDT'}, {'symbol': 'BTCUSD'}, {'symbol': 'SILVERUSDT'}]
 kucoin = get_kucoin_symbol()  # [{'symbol': 'XBTUSDTM'}, {'symbol': 'ETHUSDTM'}, {'symbol': 'SOLUSDTM'}, {'symbol': 'WIFUSDTM'}, {'symbol': 'PEPEUSDTM'}, {'symbol': 'DOGEUSDTM'}, {'symbol': 'XRPUSDTM'}]
-print(kucoin)
+gate = get_gate_symbol()  # [{'symbol': 'RAREUSDT'}, {'symbol': 'FILUSDT'}, {'symbol': 'GIGGLEUSDT'}, {'symbol': 'RECALLUSDT'}, {'symbol': 'LYNUSDT'}, {'symbol': 'SONICUSDT'}, {'symbol': 'TAUSDT'}]
 
 
 def normalize(symbol: str) -> str:
-    return symbol.replace('USDTM', '').replace('USDT', '').replace('PERP', '').replace('USDC', '').replace('_USDT', '').replace('XBT', 'BTC').replace('USD', '')
+    return symbol.replace('USDTM', '').replace('USDT', '').replace('PERP', '').replace('USDC', '').replace('_USDT', '').replace('XBT', 'BTC').replace('USD', '').replace('_', '')
 
 
 # Function for comparison symbols
-def comparison_symbols(binance: list, bybit: list, bitget: list, mexc: list, kucoin: list) -> list:
+def comparison_symbols(binance: list, bybit: list, bitget: list, mexc: list, kucoin: list, gate: list) -> list:
     binance_symbol = {normalize(item['symbol']) for item in binance}
     bybit_symbol = {normalize(item['symbol']) for item in bybit}
     bitget_symbol = {normalize(item['symbol']) for item in bitget}
     mexc_symbol = {normalize(item['symbol']) for item in mexc}
     kucoin_symbol = {normalize(item['symbol']) for item in kucoin}
-    sets = [binance_symbol, bybit_symbol, bitget_symbol, mexc_symbol, kucoin_symbol]
+    gate_symbols = {normalize(item['symbol']) for item in gate}
+    sets = [binance_symbol, bybit_symbol, bitget_symbol, mexc_symbol, kucoin_symbol, gate_symbols]
 
     return list(set().union(*sets))
 
 
-common_symbols = comparison_symbols(binance=binance, bybit=bybit, bitget=bitget, mexc=mexc, kucoin=kucoin)  # <class 'list'>
+common_symbols = comparison_symbols(binance=binance, bybit=bybit, bitget=bitget, mexc=mexc, kucoin=kucoin, gate=gate)  # <class 'list'>
 print(common_symbols, len(common_symbols))  # ['INJ', 'NIL', 'DEXE', 'PTB', 'REZ', 'CHZ', 'BANANA', 'ANIME', 'ANKR', 'FLUID', 'RENDER', 'C98', 'BLUAI', 'CTK', 'PIPPIN', 'GMX', 'LINEA', 'EVAA', 'COOKIE', 'MYX', 'ENJ',
 
 
@@ -219,7 +234,6 @@ def get_funding_mexc():
             continue
         if normalize_symbol in symbols_set:
             continue
-
         result[normalize_symbol] = {
             'funding': float(t['fundingRate'])
         }
@@ -235,11 +249,13 @@ def get_funding_kucoin():
         url = f"https://api-futures.kucoin.com/api/v1/funding-rate/{symbol}/current"
         r = requests.get(url).json()
         data = r.get('data')
-        normalize_symbol = symbol.replace('USDTM', 'USDT').replace('XBT', 'BTC')
+        normalize_symbol = symbol.replace('XBT', 'BTC')
+        print(data)
         if not data:
             continue
-        if symbols_set in symbols_set:
+        if normalize_symbol in symbols_set:
             continue
+        print(normalize_symbol)
         result[normalize_symbol] = {
             'funding': float(data['value'])
         }
@@ -249,17 +265,35 @@ def get_funding_kucoin():
     return result
 
 
+def get_funding_gate():
+    symbols_set = set(common_symbols)
+    result = {}
+    data = requests.get(GATE).json()
+    for key in data:
+        symbol = key['contract']
+        normalize_symbol = symbol.replace('_', '')
+        if normalize_symbol in symbols_set:
+            continue
+        result[normalize_symbol] = {
+            'funding': float(key['funding_rate'])
+        }
+
+    return result
+
+
 binance_funding = get_funding_binance()  # Example print {'USDCUSDT': {'funding': 5.301e-05}, 'GRIFFAINUSDT': {'funding': 5e-05}, 'GMXUSDT': {'funding': 6.258e-05}, 'BANUSDT': {'funding': 5e-05}}
 bybit_funding = get_funding_bybit()  # Example print {'0GUSDT': {'funding': -0.00062216}, '1000000BABYDOGEUSDT': {'funding': 5e-05}, '1000000CHEEMSUSDT': {'funding': 5e-05}, '1000000MOGUSDT': {'funding': -0.00065514}}
 bitget_funding = get_funding_bitget()   # Example print {'BTCUSD': {'funding': 1.2e-05}, 'ETHUSD': {'funding': 0.0001}, 'XRPUSD': {'funding': 0.0001}, 'BCHUSD': {'funding': 0.0001}, 'LTCUSD': {'funding': -0.000133}}
 mexc_funding = get_funding_mexc()  # Example {'BTCUSDT': {'funding': 5e-05}, 'ETHUSDT': {'funding': -0.000117}, 'SOLUSDT': {'funding': -0.000196}, 'RIVERUSDT': {'funding': -0.001273}, 'XAUTUSDT': {'funding': 5e-05}}
 kucoin_funding = get_funding_kucoin()  # Example {'BTCUSDT': {'funding': -7e-06}, 'ETHUSDT': {'funding': -5.5e-05}, 'SOLUSDT': {'funding': -2.8e-05}, 'WIFUSDT': {'funding': -3e-06}, 'PEPEUSDT': {'funding': -2.2e-05}}
+gate_funding = get_funding_gate()  # Example {'DOTUSDT': {'funding': -0.00012}, '人生K线USDT': {'funding': 5e-05}, 'IMXUSDT': {'funding': 5e-05}, 'USUALUSDT': {'funding': 1.2e-05}, 'EPICUSDT': {'funding': -0.00166}, 'IPUSDT': {'funding': 1.2e-05}}
 # print(binance_funding)
 # print(bybit_funding)
 # print(bitget_funding)
 # print(mexc_funding)
-# print(kucoin_funding)
-set_all_symbols_funding = set().union(binance_funding, bybit_funding, bitget_funding, mexc_funding, kucoin_funding)
+print(kucoin_funding)
+# print(gate_funding)
+set_all_symbols_funding = set().union(binance_funding, bybit_funding, bitget_funding, mexc_funding, kucoin_funding, gate_funding)
 print(set_all_symbols_funding, len(set_all_symbols_funding))
 
 
