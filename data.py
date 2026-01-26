@@ -16,6 +16,8 @@ BYBIT_DATA = 'https://api.bybit.com/v5/market/tickers'
 
 BITGET = 'https://api.bitget.com/api/v2/mix/market/tickers'
 
+MEXC = 'https://contract.mexc.com/api/v1/contract/ticker'
+
 FEES = {
     'Binance': {
         'maker:': 0.0002,
@@ -85,27 +87,40 @@ def get_bitget_symbol():
     return result
 
 
+def get_mexc_symbol():
+    result = []
+    data = requests.get(MEXC).json()
+    for key in data['data']:
+        symbol = key['symbol']
+        result.append({
+            'symbol': symbol.replace('_', '')
+        })
+    return result
+
+
 binance = get_binance_symbol()  # [{'symbol': 'BTCUSDT'}, {'symbol': 'ETHUSDT'}, {'symbol': 'BCHUSDT'}, {'symbol': 'XRPUSDT'}, {'symbol': 'LTCUSDT'}]
 bybit = get_bybit_symbol()  # [{'symbol': '0GUSDT'}, {'symbol': '1000000BABYDOGEUSDT'}, {'symbol': '1000000CHEEMSUSDT'}, {'symbol': '1000000MOGUSDT'}]
 bitget = get_bitget_symbol()  #  [{'symbol': 'BTCUSDT'}, {'symbol': 'ETHUSDT'}, {'symbol': 'XRPUSDT'}, {'symbol': 'BCHUSDT'}, {'symbol': 'LTCUSDT'}]
+mexc = get_mexc_symbol()  # [{'symbol': 'BTCUSDT'}, {'symbol': 'ETHUSDT'}, {'symbol': 'SOLUSDT'}, {'symbol': 'RIVERUSDT'}, {'symbol': 'XAUTUSDT'}, {'symbol': 'BTCUSD'}, {'symbol': 'SILVERUSDT'}]
 
 
 def normalize(symbol: str) -> str:
-    return symbol.replace('USDT', '').replace('USD', '').replace('PERP', '').replace('USDC', '')
+    return symbol.replace('USDT', '').replace('USD', '').replace('PERP', '').replace('USDC', ''). replace('_USDT', '')
 
 
 # Function for comparison symbols
-def comparison_symbols(binance: list, bybit: list, bitget: list) -> list:
+def comparison_symbols(binance: list, bybit: list, bitget: list, mexc: list) -> list:
     binance_symbol = {normalize(item['symbol']) for item in binance}
     bybit_symbol = {normalize(item['symbol']) for item in bybit}
     bitget_symbol = {normalize(item['symbol']) for item in bitget}
-    sets = [binance_symbol, bybit_symbol, bitget_symbol]
+    mexc_symbol = {normalize(item['symbol']) for item in mexc}
+    sets = [binance_symbol, bybit_symbol, bitget_symbol, mexc_symbol]
 
     return list(set().union(*sets))
 
 
-common_symbols = comparison_symbols(binance=binance, bybit=bybit, bitget=bitget)  # <class 'list'>
-# print(common_symbols, len(common_symbols))  # ['INJ', 'NIL', 'DEXE', 'PTB', 'REZ', 'CHZ', 'BANANA', 'ANIME', 'ANKR', 'FLUID', 'RENDER', 'C98', 'BLUAI', 'CTK', 'PIPPIN', 'GMX', 'LINEA', 'EVAA', 'COOKIE', 'MYX', 'ENJ',
+common_symbols = comparison_symbols(binance=binance, bybit=bybit, bitget=bitget, mexc=mexc)  # <class 'list'>
+print(common_symbols, len(common_symbols))  # ['INJ', 'NIL', 'DEXE', 'PTB', 'REZ', 'CHZ', 'BANANA', 'ANIME', 'ANKR', 'FLUID', 'RENDER', 'C98', 'BLUAI', 'CTK', 'PIPPIN', 'GMX', 'LINEA', 'EVAA', 'COOKIE', 'MYX', 'ENJ',
 
 
 def get_funding_binance() -> dict:
@@ -116,6 +131,8 @@ def get_funding_binance() -> dict:
     for key in v:
         symbol = key['symbol']
         if symbol.endswith('USDC'):
+            continue
+        if symbol.endswith('USD'):
             continue
         if symbol in symbols_set:
             continue
@@ -138,6 +155,8 @@ def get_funding_bybit():
             continue
         if symbol.endswith('USDC'):
             continue
+        if symbol.endswith('USD'):
+            continue
         if symbol in symbols_set:
             continue
 
@@ -159,6 +178,8 @@ def get_funding_bitget():
             continue
         if symbol.endswith('USDC'):
             continue
+        if symbol.endswith('USD'):
+            continue
         if symbol in symbols_set:
             continue
 
@@ -168,14 +189,36 @@ def get_funding_bitget():
     return result
 
 
+def get_funding_mexc():
+    symbols_set = set(common_symbols)
+    result = {}
+    k = requests.get(MEXC).json()
+    for t in k['data']:
+        symbol = t['symbol']
+        normalize_symbol = symbol.replace('_', '')
+        if symbol.endswith('USDC'):
+            continue
+        if symbol.endswith('USD'):
+            continue
+        if normalize_symbol in symbols_set:
+            continue
+
+        result[normalize_symbol] = {
+            'funding': float(t['fundingRate'])
+        }
+    return result
+
+
 binance_funding = get_funding_binance()  # Example print {'USDCUSDT': {'funding': 5.301e-05}, 'GRIFFAINUSDT': {'funding': 5e-05}, 'GMXUSDT': {'funding': 6.258e-05}, 'BANUSDT': {'funding': 5e-05}}
 bybit_funding = get_funding_bybit()  # Example print {'0GUSDT': {'funding': -0.00062216}, '1000000BABYDOGEUSDT': {'funding': 5e-05}, '1000000CHEEMSUSDT': {'funding': 5e-05}, '1000000MOGUSDT': {'funding': -0.00065514}}
 bitget_funding = get_funding_bitget()   # Example print {'BTCUSD': {'funding': 1.2e-05}, 'ETHUSD': {'funding': 0.0001}, 'XRPUSD': {'funding': 0.0001}, 'BCHUSD': {'funding': 0.0001}, 'LTCUSD': {'funding': -0.000133}}
+mexc_funding = get_funding_mexc()  # Example {'BTCUSDT': {'funding': 5e-05}, 'ETHUSDT': {'funding': -0.000117}, 'SOLUSDT': {'funding': -0.000196}, 'RIVERUSDT': {'funding': -0.001273}, 'XAUTUSDT': {'funding': 5e-05}}
 # print(binance_funding)
 # print(bybit_funding)
 # print(bitget_funding)
-set_all_symbols_funding = set().union(binance_funding, bybit_funding, bitget_funding)
-# print(set_all_symbols_funding, len(set_all_symbols_funding))
+print(mexc_funding)
+set_all_symbols_funding = set().union(binance_funding, bybit_funding, bitget_funding, mexc_funding)
+print(set_all_symbols_funding, len(set_all_symbols_funding))
 
 
 # # Function for data binance
