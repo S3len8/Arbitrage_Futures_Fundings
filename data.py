@@ -229,35 +229,22 @@ def get_funding_mexc():
 def get_funding_kucoin():
     symbols_set = set(common_symbols)
     result = {}
-    for item in kucoin:
-        for key in item.values():
-            url = f'https://api-futures.kucoin.com/api/v1/funding-rate/{key}/current'
-            k = requests.get(url=url)
-            resp = k.json()
-            # If HTTP-problem
-            if k.status_code != 200:
-                continue
-            data = resp['data']
-            if not isinstance(data, dict):
-                continue
+    symbols = get_kucoin_symbol()
+    for item in symbols:
+        symbol = item['symbol']
+        url = f"https://api-futures.kucoin.com/api/v1/funding-rate/{symbol}/current"
+        r = requests.get(url).json()
+        data = r.get('data')
+        normalize_symbol = symbol.replace('USDTM', 'USDT').replace('XBT', 'BTC')
+        if not data:
+            continue
+        if symbols_set in symbols_set:
+            continue
+        result[normalize_symbol] = {
+            'funding': float(data['value'])
+        }
 
-            symbol_name = data.get('symbol')
-            value = data.get('value')
-
-            if not symbol_name or value is None:
-                continue
-
-            if symbol_name.endswith(('USDC', 'USD')):
-                continue
-
-            if symbol_name in symbols_set:
-                continue
-
-            result[symbol_name] = {
-                'funding': float(value)
-            }
-
-            time.sleep(0.1)
+        time.sleep(0.05)  # Rate limit
 
     return result
 
@@ -266,13 +253,13 @@ binance_funding = get_funding_binance()  # Example print {'USDCUSDT': {'funding'
 bybit_funding = get_funding_bybit()  # Example print {'0GUSDT': {'funding': -0.00062216}, '1000000BABYDOGEUSDT': {'funding': 5e-05}, '1000000CHEEMSUSDT': {'funding': 5e-05}, '1000000MOGUSDT': {'funding': -0.00065514}}
 bitget_funding = get_funding_bitget()   # Example print {'BTCUSD': {'funding': 1.2e-05}, 'ETHUSD': {'funding': 0.0001}, 'XRPUSD': {'funding': 0.0001}, 'BCHUSD': {'funding': 0.0001}, 'LTCUSD': {'funding': -0.000133}}
 mexc_funding = get_funding_mexc()  # Example {'BTCUSDT': {'funding': 5e-05}, 'ETHUSDT': {'funding': -0.000117}, 'SOLUSDT': {'funding': -0.000196}, 'RIVERUSDT': {'funding': -0.001273}, 'XAUTUSDT': {'funding': 5e-05}}
-kucoin_funding = get_funding_kucoin()
+kucoin_funding = get_funding_kucoin()  # Example {'BTCUSDT': {'funding': -7e-06}, 'ETHUSDT': {'funding': -5.5e-05}, 'SOLUSDT': {'funding': -2.8e-05}, 'WIFUSDT': {'funding': -3e-06}, 'PEPEUSDT': {'funding': -2.2e-05}}
 # print(binance_funding)
 # print(bybit_funding)
 # print(bitget_funding)
 # print(mexc_funding)
-print(kucoin_funding)
-set_all_symbols_funding = set().union(binance_funding, bybit_funding, bitget_funding, mexc_funding)
+# print(kucoin_funding)
+set_all_symbols_funding = set().union(binance_funding, bybit_funding, bitget_funding, mexc_funding, kucoin_funding)
 print(set_all_symbols_funding, len(set_all_symbols_funding))
 
 
