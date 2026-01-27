@@ -142,7 +142,7 @@ bitget = get_bitget_symbol()  #  [{'symbol': 'BTCUSDT'}, {'symbol': 'ETHUSDT'}, 
 mexc = get_mexc_symbol()  # [{'symbol': 'BTCUSDT'}, {'symbol': 'ETHUSDT'}, {'symbol': 'SOLUSDT'}, {'symbol': 'RIVERUSDT'}, {'symbol': 'XAUTUSDT'}, {'symbol': 'BTCUSD'}, {'symbol': 'SILVERUSDT'}]
 kucoin = asyncio.run(get_kucoin_symbol())  # {'BTC': 'XBTUSDTM', 'ETH': 'ETHUSDTM', 'SOL': 'SOLUSDTM', 'WIF': 'WIFUSDTM', 'PEPE': 'PEPEUSDTM', 'DOGE': 'DOGEUSDTM', 'XRP': 'XRPUSDTM', '0G': '0GUSDTM'} [{'symbol': 'XBTUSDTM'}, {'symbol': 'ETHUSDTM'}, {'symbol': 'SOLUSDTM'}, {'symbol': 'WIFUSDTM'}, {'symbol': 'PEPEUSDTM'}, {'symbol': 'DOGEUSDTM'}, {'symbol': 'XRPUSDTM'}]
 gate = get_gate_symbol()  # [{'symbol': 'RAREUSDT'}, {'symbol': 'FILUSDT'}, {'symbol': 'GIGGLEUSDT'}, {'symbol': 'RECALLUSDT'}, {'symbol': 'LYNUSDT'}, {'symbol': 'SONICUSDT'}, {'symbol': 'TAUSDT'}]
-print(kucoin)
+# print(kucoin)
 
 
 async def fetch_all_and_compare():
@@ -172,7 +172,7 @@ def comparison_symbols(binance: list, bybit: list, bitget: list, mexc: list, kuc
 kucoin = asyncio.run(fetch_all_and_compare())
 kucoin_list = kucoin[0]
 common_symbols = comparison_symbols(binance=binance, bybit=bybit, bitget=bitget, mexc=mexc, kucoin=kucoin_list, gate=gate)  # <class 'list'>
-print(common_symbols, len(common_symbols))  # ['INJ', 'NIL', 'DEXE', 'PTB', 'REZ', 'CHZ', 'BANANA', 'ANIME', 'ANKR', 'FLUID', 'RENDER', 'C98', 'BLUAI', 'CTK', 'PIPPIN', 'GMX', 'LINEA', 'EVAA', 'COOKIE', 'MYX', 'ENJ']
+# print(common_symbols, len(common_symbols))  # ['INJ', 'NIL', 'DEXE', 'PTB', 'REZ', 'CHZ', 'BANANA', 'ANIME', 'ANKR', 'FLUID', 'RENDER', 'C98', 'BLUAI', 'CTK', 'PIPPIN', 'GMX', 'LINEA', 'EVAA', 'COOKIE', 'MYX', 'ENJ']
 
 
 def get_funding_binance() -> dict:
@@ -335,11 +335,11 @@ no_kucoin_funding = {k.replace('USDTM', 'USDT').replace('XBT', 'BTC'): v for k, 
 # print(bybit_funding)
 # print(bitget_funding)
 # print(mexc_funding)
-print(kucoin_funding)
+# print(kucoin_funding)
 # print(gate_funding)
-print(no_kucoin_funding)
+# print(no_kucoin_funding)
 set_all_symbols_funding = set().union(binance_funding, bybit_funding, bitget_funding, mexc_funding, no_kucoin_funding, gate_funding)
-print(set_all_symbols_funding, len(set_all_symbols_funding))
+# print(set_all_symbols_funding, len(set_all_symbols_funding))
 
 
 # # Function for data binance

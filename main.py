@@ -1,13 +1,12 @@
 from data import FEES, set_all_symbols_funding, binance_funding, bybit_funding, bitget_funding, mexc_funding, no_kucoin_funding, gate_funding
 
 
-print(no_kucoin_funding)
 # Function get funding from binance and bybit in set coins_after_comparison
 def get_funding(binance: dict, bybit: dict, bitget: dict, mexc: dict, kucoin: dict, gate: dict) -> dict:
     result = {
-        6: {},
-        5: {},
-        4: {},
+        6: {},  # Coin in 6
+        5: {},  # Coin in 5
+        4: {},  # Coin in 4
         3: {},  # Coin in 3
         2: {},  # Coin in 2
         1: {},  # Coin in 1
@@ -55,8 +54,8 @@ def get_funding(binance: dict, bybit: dict, bitget: dict, mexc: dict, kucoin: di
 
 funding = get_funding(binance_funding, bybit_funding, bitget_funding, mexc_funding, no_kucoin_funding, gate_funding)  # <class 'dict'>
 print(funding)
-# for symbol, data in funding.items():
-#     print(symbol, data['binance'], data['bybit'], data['bitget'])
+for key in [6, 5, 4, 3, 2, 1]:
+    print(f"{key} exchanges: {funding.get(key)}")
 
 
 def get_better_funding():
