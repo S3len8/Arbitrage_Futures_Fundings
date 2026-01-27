@@ -326,7 +326,7 @@ def get_funding_gate():
 
 binance_funding = get_funding_binance()  # Example print {'USDCUSDT': {'funding': 5.301e-05}, 'GRIFFAINUSDT': {'funding': 5e-05}, 'GMXUSDT': {'funding': 6.258e-05}, 'BANUSDT': {'funding': 5e-05}}
 bybit_funding = get_funding_bybit()  # Example print {'0GUSDT': {'funding': -0.00062216}, '1000000BABYDOGEUSDT': {'funding': 5e-05}, '1000000CHEEMSUSDT': {'funding': 5e-05}, '1000000MOGUSDT': {'funding': -0.00065514}}
-bitget_funding = get_funding_bitget()   # Example print {'BTCUSD': {'funding': 1.2e-05}, 'ETHUSD': {'funding': 0.0001}, 'XRPUSD': {'funding': 0.0001}, 'BCHUSD': {'funding': 0.0001}, 'LTCUSD': {'funding': -0.000133}}
+bitget_funding = get_funding_bitget()   # Example print {'BTCUSDT': {'funding': 5.8e-05}, 'ETHUSDT': {'funding': 1.5e-05}, 'XRPUSDT': {'funding': 0.0001}, 'BCHUSDT': {'funding': -6.6e-05}, 'LTCUSDT': {'funding': 0.0001}}
 mexc_funding = get_funding_mexc()  # Example {'BTCUSDT': {'funding': 5e-05}, 'ETHUSDT': {'funding': -0.000117}, 'SOLUSDT': {'funding': -0.000196}, 'RIVERUSDT': {'funding': -0.001273}, 'XAUTUSDT': {'funding': 5e-05}}
 kucoin_funding = asyncio.run(get_funding_kucoin(symbols))  # Example {'BTCUSDT': {'funding': -7e-06}, 'ETHUSDT': {'funding': -5.5e-05}, 'SOLUSDT': {'funding': -2.8e-05}, 'WIFUSDT': {'funding': -3e-06}, 'PEPEUSDT': {'funding': -2.2e-05}}  {'XBTUSDTM': -8e-06, 'ETHUSDTM': 8e-06, 'SOLUSDTM': -4e-06, 'WIFUSDTM': 0.000144, 'PEPEUSDTM': -0.000166, 'DOGEUSDTM': -9.2e-05, 'XRPUSDTM': -2e-05, '0GUSDTM': 0.000388}
 gate_funding = get_funding_gate()  # Example {'DOTUSDT': {'funding': -0.00012}, '人生K线USDT': {'funding': 5e-05}, 'IMXUSDT': {'funding': 5e-05}, 'USUALUSDT': {'funding': 1.2e-05}, 'EPICUSDT': {'funding': -0.00166}, 'IPUSDT': {'funding': 1.2e-05}}
