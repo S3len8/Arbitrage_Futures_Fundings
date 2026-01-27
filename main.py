@@ -1,9 +1,13 @@
-from data import FEES, set_all_symbols_funding, binance_funding, bybit_funding, bitget_funding
+from data import FEES, set_all_symbols_funding, binance_funding, bybit_funding, bitget_funding, mexc_funding, no_kucoin_funding, gate_funding
 
 
+print(no_kucoin_funding)
 # Function get funding from binance and bybit in set coins_after_comparison
-def get_funding(binance: dict, bybit: dict, bitget: dict) -> dict:
+def get_funding(binance: dict, bybit: dict, bitget: dict, mexc: dict, kucoin: dict, gate: dict) -> dict:
     result = {
+        6: {},
+        5: {},
+        4: {},
         3: {},  # Coin in 3
         2: {},  # Coin in 2
         1: {},  # Coin in 1
@@ -24,6 +28,21 @@ def get_funding(binance: dict, bybit: dict, bitget: dict) -> dict:
             funding = bitget[symbol]['funding'] * 100
             if -0.1 <= funding <= 0.1:  # Filter for getting necessary funding percent from exchanges
                 exchanges['bitget'] = funding
+
+        if symbol in mexc and mexc[symbol].get('funding') is not None:  # Getting and calculation funding in percent from Mexc
+            funding = mexc[symbol]['funding'] * 100
+            if -0.1 <= funding <= 0.1:  # Filter for getting necessary funding percent from exchanges
+                exchanges['mexc'] = funding
+
+        if symbol in kucoin and isinstance(kucoin[symbol], dict) and kucoin[symbol].get('funding') is not None:  # Getting and calculation funding in percent from Kucoin
+            funding = kucoin[symbol]['funding'] * 100
+            if -0.1 <= funding <= 0.1:  # Filter for getting necessary funding percent from exchanges
+                exchanges['kucoin'] = funding
+
+        if symbol in gate and gate[symbol].get('funding') is not None:  # Getting and calculation funding in percent from Gate
+            funding = gate[symbol]['funding'] * 100
+            if -0.1 <= funding <= 0.1:  # Filter for getting necessary funding percent from exchanges
+                exchanges['gate'] = funding
         count = len(exchanges)
 
         if count == 0:
@@ -34,7 +53,7 @@ def get_funding(binance: dict, bybit: dict, bitget: dict) -> dict:
     return result
 
 
-funding = get_funding(binance_funding, bybit_funding, bitget_funding)  # <class 'dict'>
+funding = get_funding(binance_funding, bybit_funding, bitget_funding, mexc_funding, no_kucoin_funding, gate_funding)  # <class 'dict'>
 print(funding)
 # for symbol, data in funding.items():
 #     print(symbol, data['binance'], data['bybit'], data['bitget'])
