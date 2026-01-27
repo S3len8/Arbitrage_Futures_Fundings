@@ -21,6 +21,7 @@ BITGET = 'https://api.bitget.com/api/v2/mix/market/tickers'
 MEXC = 'https://contract.mexc.com/api/v1/contract/ticker'
 
 KUCOIN = 'https://api-futures.kucoin.com/api/v1/contracts/active'
+KUCOIN_FUNDING = "https://api-futures.kucoin.com/api/v1/funding-rate/{symbol}/current"
 
 GATE = 'https://api.gateio.ws/api/v4/futures/usdt/tickers'
 
@@ -120,10 +121,7 @@ async def get_kucoin_symbol():
         async with session.get(KUCOIN) as kucoin:
             data = await kucoin.json()
 
-    return {
-        item['symbol'].replace('USDTM', '').replace('XBT', 'BTC'): item['symbol']
-        for item in data['data']
-    }
+    return [{'symbol': item['symbol']} for item in data['data']]
 
 
 def get_gate_symbol():
@@ -152,7 +150,7 @@ async def fetch_all_and_compare():
         get_kucoin_symbol(),
     )
 
-    return binance, bybit, bitget, mexc, kucoin, gate
+    return kucoin
 
 
 def normalize(symbol: str) -> str:
@@ -173,7 +171,7 @@ def comparison_symbols(binance: list, bybit: list, bitget: list, mexc: list, kuc
 
 kucoin = asyncio.run(fetch_all_and_compare())
 kucoin_list = kucoin[0]
-common_symbols = comparison_symbols(binance=binance, bybit=bybit, bitget=bitget, mexc=mexc, kucoin=kucoin, gate=gate)  # <class 'list'>
+common_symbols = comparison_symbols(binance=binance, bybit=bybit, bitget=bitget, mexc=mexc, kucoin=kucoin_list, gate=gate)  # <class 'list'>
 print(common_symbols, len(common_symbols))  # ['INJ', 'NIL', 'DEXE', 'PTB', 'REZ', 'CHZ', 'BANANA', 'ANIME', 'ANKR', 'FLUID', 'RENDER', 'C98', 'BLUAI', 'CTK', 'PIPPIN', 'GMX', 'LINEA', 'EVAA', 'COOKIE', 'MYX', 'ENJ']
 
 
@@ -262,29 +260,54 @@ def get_funding_mexc():
     return result
 
 
-def get_funding_kucoin():
-    symbols_set = set(common_symbols)
-    result = {}
-    symbols = get_kucoin_symbol()
-    for item in symbols:
-        symbol = item['symbol']
-        url = f"https://api-futures.kucoin.com/api/v1/funding-rate/{symbol}/current"
-        r = requests.get(url).json()
-        data = r.get('data')
-        normalize_symbol = symbol.replace('XBT', 'BTC')
-        print(data)
-        if not data:
-            continue
-        if normalize_symbol in symbols_set:
-            continue
-        print(normalize_symbol)
-        result[normalize_symbol] = {
-            'funding': float(data['value'])
-        }
+# def get_funding_kucoin():
+#     symbols_set = set(common_symbols)
+#     result = {}
+#     symbols = get_kucoin_symbol()
+#     for item in symbols:
+#         symbol = item['symbol']
+#         url = f"https://api-futures.kucoin.com/api/v1/funding-rate/{symbol}/current"
+#         r = requests.get(url).json()
+#         data = r.get('data')
+#         normalize_symbol = symbol.replace('XBT', 'BTC')
+#         print(data)
+#         if not data:
+#             continue
+#         if normalize_symbol in symbols_set:
+#             continue
+#         print(normalize_symbol)
+#         result[normalize_symbol] = {
+#             'funding': float(data['value'])
+#         }
+#
+#         time.sleep(0.05)  # Rate limit
+#
+#     return result
 
-        time.sleep(0.05)  # Rate limit
+async def fetch_funding(session, symbol):
+    url = KUCOIN_FUNDING.format(symbol=symbol)
+    try:
+        async with session.get(url) as r:
+            data = await r.json()
+            if data.get('code') != "200000":
+                print(f"Warning: funding not supported for {symbol} ({data.get('msg')})")
+                return symbol, None
+            return symbol, float(data['data']['value'])
+    except Exception as e:
+        print(f"Error fetching {symbol}: {e}")
+        return symbol, None
 
-    return result
+
+async def get_funding_kucoin(symbols):
+    async with aiohttp.ClientSession() as session:
+        tasks = [fetch_funding(session, s) for s in symbols]  # один task на символ
+        results = await asyncio.gather(*tasks)
+        return dict(results)
+
+
+symbols = [item['symbol'] for item in kucoin_list]
+funding = asyncio.run(get_funding_kucoin(symbols))
+print(funding)
 
 
 def get_funding_gate():
@@ -307,7 +330,7 @@ binance_funding = get_funding_binance()  # Example print {'USDCUSDT': {'funding'
 bybit_funding = get_funding_bybit()  # Example print {'0GUSDT': {'funding': -0.00062216}, '1000000BABYDOGEUSDT': {'funding': 5e-05}, '1000000CHEEMSUSDT': {'funding': 5e-05}, '1000000MOGUSDT': {'funding': -0.00065514}}
 bitget_funding = get_funding_bitget()   # Example print {'BTCUSD': {'funding': 1.2e-05}, 'ETHUSD': {'funding': 0.0001}, 'XRPUSD': {'funding': 0.0001}, 'BCHUSD': {'funding': 0.0001}, 'LTCUSD': {'funding': -0.000133}}
 mexc_funding = get_funding_mexc()  # Example {'BTCUSDT': {'funding': 5e-05}, 'ETHUSDT': {'funding': -0.000117}, 'SOLUSDT': {'funding': -0.000196}, 'RIVERUSDT': {'funding': -0.001273}, 'XAUTUSDT': {'funding': 5e-05}}
-kucoin_funding = get_funding_kucoin()  # Example {'BTCUSDT': {'funding': -7e-06}, 'ETHUSDT': {'funding': -5.5e-05}, 'SOLUSDT': {'funding': -2.8e-05}, 'WIFUSDT': {'funding': -3e-06}, 'PEPEUSDT': {'funding': -2.2e-05}}
+kucoin_funding = asyncio.run(get_funding_kucoin())  # Example {'BTCUSDT': {'funding': -7e-06}, 'ETHUSDT': {'funding': -5.5e-05}, 'SOLUSDT': {'funding': -2.8e-05}, 'WIFUSDT': {'funding': -3e-06}, 'PEPEUSDT': {'funding': -2.2e-05}}
 gate_funding = get_funding_gate()  # Example {'DOTUSDT': {'funding': -0.00012}, '人生K线USDT': {'funding': 5e-05}, 'IMXUSDT': {'funding': 5e-05}, 'USUALUSDT': {'funding': 1.2e-05}, 'EPICUSDT': {'funding': -0.00166}, 'IPUSDT': {'funding': 1.2e-05}}
 # print(binance_funding)
 # print(bybit_funding)
