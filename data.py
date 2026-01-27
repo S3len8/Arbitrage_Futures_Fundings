@@ -1,3 +1,5 @@
+import aiohttp
+import asyncio
 import requests
 import time
 import hmac
@@ -102,16 +104,25 @@ def get_mexc_symbol():
     return result
 
 
-def get_kucoin_symbol():
-    result = []
-    data = requests.get(KUCOIN).json()
-    for key in data['data']:
-        symbol = key['symbol']
-        result.append({
-            'symbol': symbol.replace('XBT', 'BTC').replace('USDTM', 'USDT'),
-        })
+# def get_kucoin_symbol():
+#     result = []
+#     data = requests.get(KUCOIN).json()
+#     for key in data['data']:
+#         symbol = key['symbol']
+#         result.append({
+#             'symbol': symbol.replace('XBT', 'BTC').replace('USDTM', 'USDT'),
+#         })
+#
+#     return result
 
-    return result
+async def get_kucoin_symbol():
+    async with aiohttp.ClientSession() as session:
+        async with session.get(KUCOIN) as kucoin:
+            data = await kucoin.json()
+
+    return {
+        item['symbol'].replace('USDTM', ''): item['symbol'] for item in data['data']
+    }
 
 
 def get_gate_symbol():
@@ -132,6 +143,7 @@ bitget = get_bitget_symbol()  #  [{'symbol': 'BTCUSDT'}, {'symbol': 'ETHUSDT'}, 
 mexc = get_mexc_symbol()  # [{'symbol': 'BTCUSDT'}, {'symbol': 'ETHUSDT'}, {'symbol': 'SOLUSDT'}, {'symbol': 'RIVERUSDT'}, {'symbol': 'XAUTUSDT'}, {'symbol': 'BTCUSD'}, {'symbol': 'SILVERUSDT'}]
 kucoin = get_kucoin_symbol()  # [{'symbol': 'XBTUSDTM'}, {'symbol': 'ETHUSDTM'}, {'symbol': 'SOLUSDTM'}, {'symbol': 'WIFUSDTM'}, {'symbol': 'PEPEUSDTM'}, {'symbol': 'DOGEUSDTM'}, {'symbol': 'XRPUSDTM'}]
 gate = get_gate_symbol()  # [{'symbol': 'RAREUSDT'}, {'symbol': 'FILUSDT'}, {'symbol': 'GIGGLEUSDT'}, {'symbol': 'RECALLUSDT'}, {'symbol': 'LYNUSDT'}, {'symbol': 'SONICUSDT'}, {'symbol': 'TAUSDT'}]
+print(kucoin)
 
 
 def normalize(symbol: str) -> str:
