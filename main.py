@@ -15,33 +15,27 @@ def get_funding(binance: dict, bybit: dict, bitget: dict, mexc: dict, kucoin: di
         exchanges = {}
         if symbol in binance and binance[symbol].get('funding') is not None:  # Getting and calculation funding in percent from Binance
             funding = binance[symbol]['funding'] * 100
-            if -0.1 <= funding <= 0.1:  # Filter for getting necessary funding percent from exchanges
-                exchanges['binance'] = funding
+            exchanges['binance'] = funding
 
         if symbol in bybit and bybit[symbol].get('funding') is not None:  # Getting and calculation funding in percent from Bybit
             funding = bybit[symbol]['funding'] * 100
-            if -0.1 <= funding <= 0.1:  # Filter for getting necessary funding percent from exchanges
-                exchanges['bybit'] = funding
+            exchanges['bybit'] = funding
 
         if symbol in bitget and bitget[symbol].get('funding') is not None:  # Getting and calculation funding in percent from Bitget
             funding = bitget[symbol]['funding'] * 100
-            if -0.1 <= funding <= 0.1:  # Filter for getting necessary funding percent from exchanges
-                exchanges['bitget'] = funding
+            exchanges['bitget'] = funding
 
         if symbol in mexc and mexc[symbol].get('funding') is not None:  # Getting and calculation funding in percent from Mexc
             funding = mexc[symbol]['funding'] * 100
-            if -0.1 <= funding <= 0.1:  # Filter for getting necessary funding percent from exchanges
-                exchanges['mexc'] = funding
+            exchanges['mexc'] = funding
 
         if symbol in kucoin and isinstance(kucoin[symbol], dict) and kucoin[symbol].get('funding') is not None:  # Getting and calculation funding in percent from Kucoin
             funding = kucoin[symbol]['funding'] * 100
-            if -0.1 <= funding <= 0.1:  # Filter for getting necessary funding percent from exchanges
-                exchanges['kucoin'] = funding
+            exchanges['kucoin'] = funding
 
         if symbol in gate and gate[symbol].get('funding') is not None:  # Getting and calculation funding in percent from Gate
             funding = gate[symbol]['funding'] * 100
-            if -0.1 <= funding <= 0.1:  # Filter for getting necessary funding percent from exchanges
-                exchanges['gate'] = funding
+            exchanges['gate'] = funding
         count = len(exchanges)
 
         if count == 0:
@@ -60,22 +54,16 @@ for key in [6, 5, 4, 3, 2, 1]:
 
 def get_better_funding():
     result = {}
-    for key in funding:
-        funding_A = (funding[key]['binance'])  # Getting and calculation funding in percent from Binance
-        funding_B = (funding[key]['bybit'])  # Getting and calculation funding in percent from Bybit
-        funding_dict = {
-            'Binance': funding_A,
-            'Bybit': funding_B,
-        }
-        bigger_funding = max(funding_dict, key=lambda k: abs(funding_dict[k]))
-        if bigger_funding == 'Binance':  # Check bigger funding
-            result[key] = {
-                'Binance funding': funding_A,
-            }
-        elif bigger_funding == 'Bybit':  # Next can add same if for each exchange
-            result[key] = {
-                'Bybit funding': funding_B,
-            }
+    for count, symbols in funding.items():
+        filtered_symbols = {}
+        for symbol, exchanges in symbols.items():
+            filtered_exchanges = {exch: fund for exch, fund in exchanges.items() if abs(fund) >= 0.1}
+            if filtered_exchanges:
+                filtered_symbols[symbol] = filtered_exchanges
+
+        if filtered_symbols:
+            result[count] = filtered_symbols
+
     return result
 
 
