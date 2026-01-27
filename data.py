@@ -300,14 +300,12 @@ async def fetch_funding(session, symbol):
 
 async def get_funding_kucoin(symbols):
     async with aiohttp.ClientSession() as session:
-        tasks = [fetch_funding(session, s) for s in symbols]  # один task на символ
+        tasks = [fetch_funding(session, s) for s in symbols]
         results = await asyncio.gather(*tasks)
         return dict(results)
 
 
 symbols = [item['symbol'] for item in kucoin_list]
-funding = asyncio.run(get_funding_kucoin(symbols))
-print(funding)
 
 
 def get_funding_gate():
@@ -330,15 +328,17 @@ binance_funding = get_funding_binance()  # Example print {'USDCUSDT': {'funding'
 bybit_funding = get_funding_bybit()  # Example print {'0GUSDT': {'funding': -0.00062216}, '1000000BABYDOGEUSDT': {'funding': 5e-05}, '1000000CHEEMSUSDT': {'funding': 5e-05}, '1000000MOGUSDT': {'funding': -0.00065514}}
 bitget_funding = get_funding_bitget()   # Example print {'BTCUSD': {'funding': 1.2e-05}, 'ETHUSD': {'funding': 0.0001}, 'XRPUSD': {'funding': 0.0001}, 'BCHUSD': {'funding': 0.0001}, 'LTCUSD': {'funding': -0.000133}}
 mexc_funding = get_funding_mexc()  # Example {'BTCUSDT': {'funding': 5e-05}, 'ETHUSDT': {'funding': -0.000117}, 'SOLUSDT': {'funding': -0.000196}, 'RIVERUSDT': {'funding': -0.001273}, 'XAUTUSDT': {'funding': 5e-05}}
-kucoin_funding = asyncio.run(get_funding_kucoin())  # Example {'BTCUSDT': {'funding': -7e-06}, 'ETHUSDT': {'funding': -5.5e-05}, 'SOLUSDT': {'funding': -2.8e-05}, 'WIFUSDT': {'funding': -3e-06}, 'PEPEUSDT': {'funding': -2.2e-05}}
+kucoin_funding = asyncio.run(get_funding_kucoin(symbols))  # Example {'BTCUSDT': {'funding': -7e-06}, 'ETHUSDT': {'funding': -5.5e-05}, 'SOLUSDT': {'funding': -2.8e-05}, 'WIFUSDT': {'funding': -3e-06}, 'PEPEUSDT': {'funding': -2.2e-05}}  {'XBTUSDTM': -8e-06, 'ETHUSDTM': 8e-06, 'SOLUSDTM': -4e-06, 'WIFUSDTM': 0.000144, 'PEPEUSDTM': -0.000166, 'DOGEUSDTM': -9.2e-05, 'XRPUSDTM': -2e-05, '0GUSDTM': 0.000388}
 gate_funding = get_funding_gate()  # Example {'DOTUSDT': {'funding': -0.00012}, '人生K线USDT': {'funding': 5e-05}, 'IMXUSDT': {'funding': 5e-05}, 'USUALUSDT': {'funding': 1.2e-05}, 'EPICUSDT': {'funding': -0.00166}, 'IPUSDT': {'funding': 1.2e-05}}
+no_kucoin_funding = {k.replace('USDTM', 'USDT').replace('XBT', 'BTC'): v for k, v in kucoin_funding.items()}  # Need for converting symbols ETHUSDTM to ETHUSDT
 # print(binance_funding)
 # print(bybit_funding)
 # print(bitget_funding)
 # print(mexc_funding)
-print(kucoin_funding)
+# print(kucoin_funding)
 # print(gate_funding)
-set_all_symbols_funding = set().union(binance_funding, bybit_funding, bitget_funding, mexc_funding, kucoin_funding, gate_funding)
+# print(no_kucoin_funding)
+set_all_symbols_funding = set().union(binance_funding, bybit_funding, bitget_funding, mexc_funding, no_kucoin_funding, gate_funding)
 print(set_all_symbols_funding, len(set_all_symbols_funding))
 
 
