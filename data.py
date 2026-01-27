@@ -121,7 +121,8 @@ async def get_kucoin_symbol():
             data = await kucoin.json()
 
     return {
-        item['symbol'].replace('USDTM', ''): item['symbol'] for item in data['data']
+        item['symbol'].replace('USDTM', '').replace('XBT', 'BTC'): item['symbol']
+        for item in data['data']
     }
 
 
@@ -141,16 +142,23 @@ binance = get_binance_symbol()  # [{'symbol': 'BTCUSDT'}, {'symbol': 'ETHUSDT'},
 bybit = get_bybit_symbol()  # [{'symbol': '0GUSDT'}, {'symbol': '1000000BABYDOGEUSDT'}, {'symbol': '1000000CHEEMSUSDT'}, {'symbol': '1000000MOGUSDT'}]
 bitget = get_bitget_symbol()  #  [{'symbol': 'BTCUSDT'}, {'symbol': 'ETHUSDT'}, {'symbol': 'XRPUSDT'}, {'symbol': 'BCHUSDT'}, {'symbol': 'LTCUSDT'}]
 mexc = get_mexc_symbol()  # [{'symbol': 'BTCUSDT'}, {'symbol': 'ETHUSDT'}, {'symbol': 'SOLUSDT'}, {'symbol': 'RIVERUSDT'}, {'symbol': 'XAUTUSDT'}, {'symbol': 'BTCUSD'}, {'symbol': 'SILVERUSDT'}]
-kucoin = get_kucoin_symbol()  # [{'symbol': 'XBTUSDTM'}, {'symbol': 'ETHUSDTM'}, {'symbol': 'SOLUSDTM'}, {'symbol': 'WIFUSDTM'}, {'symbol': 'PEPEUSDTM'}, {'symbol': 'DOGEUSDTM'}, {'symbol': 'XRPUSDTM'}]
+kucoin = asyncio.run(get_kucoin_symbol())  # {'BTC': 'XBTUSDTM', 'ETH': 'ETHUSDTM', 'SOL': 'SOLUSDTM', 'WIF': 'WIFUSDTM', 'PEPE': 'PEPEUSDTM', 'DOGE': 'DOGEUSDTM', 'XRP': 'XRPUSDTM', '0G': '0GUSDTM'} [{'symbol': 'XBTUSDTM'}, {'symbol': 'ETHUSDTM'}, {'symbol': 'SOLUSDTM'}, {'symbol': 'WIFUSDTM'}, {'symbol': 'PEPEUSDTM'}, {'symbol': 'DOGEUSDTM'}, {'symbol': 'XRPUSDTM'}]
 gate = get_gate_symbol()  # [{'symbol': 'RAREUSDT'}, {'symbol': 'FILUSDT'}, {'symbol': 'GIGGLEUSDT'}, {'symbol': 'RECALLUSDT'}, {'symbol': 'LYNUSDT'}, {'symbol': 'SONICUSDT'}, {'symbol': 'TAUSDT'}]
 print(kucoin)
+
+
+async def fetch_all_and_compare():
+    kucoin = await asyncio.gather(
+        get_kucoin_symbol(),
+    )
+
+    return binance, bybit, bitget, mexc, kucoin, gate
 
 
 def normalize(symbol: str) -> str:
     return symbol.replace('USDTM', '').replace('USDT', '').replace('PERP', '').replace('USDC', '').replace('_USDT', '').replace('XBT', 'BTC').replace('USD', '').replace('_', '')
 
 
-# Function for comparison symbols
 def comparison_symbols(binance: list, bybit: list, bitget: list, mexc: list, kucoin: list, gate: list) -> list:
     binance_symbol = {normalize(item['symbol']) for item in binance}
     bybit_symbol = {normalize(item['symbol']) for item in bybit}
@@ -163,8 +171,10 @@ def comparison_symbols(binance: list, bybit: list, bitget: list, mexc: list, kuc
     return list(set().union(*sets))
 
 
+kucoin = asyncio.run(fetch_all_and_compare())
+kucoin_list = kucoin[0]
 common_symbols = comparison_symbols(binance=binance, bybit=bybit, bitget=bitget, mexc=mexc, kucoin=kucoin, gate=gate)  # <class 'list'>
-print(common_symbols, len(common_symbols))  # ['INJ', 'NIL', 'DEXE', 'PTB', 'REZ', 'CHZ', 'BANANA', 'ANIME', 'ANKR', 'FLUID', 'RENDER', 'C98', 'BLUAI', 'CTK', 'PIPPIN', 'GMX', 'LINEA', 'EVAA', 'COOKIE', 'MYX', 'ENJ',
+print(common_symbols, len(common_symbols))  # ['INJ', 'NIL', 'DEXE', 'PTB', 'REZ', 'CHZ', 'BANANA', 'ANIME', 'ANKR', 'FLUID', 'RENDER', 'C98', 'BLUAI', 'CTK', 'PIPPIN', 'GMX', 'LINEA', 'EVAA', 'COOKIE', 'MYX', 'ENJ']
 
 
 def get_funding_binance() -> dict:
