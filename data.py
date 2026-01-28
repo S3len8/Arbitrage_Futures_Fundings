@@ -5,7 +5,7 @@ import requests
 # import hmac
 # import hashlib
 # from urllib.parse import urlencode
-from symbol import BINANCE_ORDER_BOOK, BINANCE_DATA, BYBIT_DATA, BITGET
+from symbol import BINANCE_ORDER_BOOK, BINANCE_DATA, BYBIT_DATA, BITGET, MEXC
 from filtered_funding import symbols_map
 #
 # API_KEY = 'OcirhzEKhIgPDd9wcV0fOTaMMoVBq3mLY8ESmEFZXcZ53doPfPIgsSZMZVz74bSy'
@@ -392,9 +392,10 @@ def get_data_bybit(symbol: str) -> dict:
 
 def get_data_bitget(symbol: str) -> dict:
     result = {}
-    k = requests.get(BITGET).json()
+    params = {"productType": "USDT-FUTURES"}
+    k = requests.get(BITGET, params=params).json()
     for t in k['data']:
-        if t['symbol'] == symbol:
+        if t['symbol'] == symbol.replace('USDT', 'USD'):
             result[symbol] = {
                 'bid': float(t['bidPr']),
                 'ask': float(t['askPr']),
@@ -403,15 +404,28 @@ def get_data_bitget(symbol: str) -> dict:
     return result
 
 
+# def get_data_mexc(symbol: str) -> dict:
+#     result = {}
+#     k = requests.get(MEXC).json()
+#     for t in k['data']:
+#         if t['symbol'] == symbol.replace('USDT', '_USDT'):
+#             result[symbol] = {
+#                 'bid': float(t['bid1']),
+#                 'ask': float(t['ask1']),
+#                 'volume 24H': float(t['volume24']),
+#             }
+#     return result
+
+
 for symbol, exchanges in symbols_map.items():
     if 'binance' in exchanges:
         print(data) if (data := get_data_binance(symbol)) else None  # Need for get only coins with data
     if 'bybit' in exchanges:
-        print(data) if (data := get_data_binance(symbol)) else None  # Need for get only coins with data
+        print(data) if (data := get_data_bybit(symbol)) else None  # Need for get only coins with data
     if 'bitget' in exchanges:
-        print(data) if (data := get_data_binance(symbol)) else None  # Need for get only coins with data
+        print(data) if (data := get_data_bitget(symbol)) else None  # Need for get only coins with data
     # if 'mexc' in exchanges:
-    #     print(data) if (data := get_data_binance(symbol)) else None  # Need for get only coins with data
+    #     print(data) if (data := get_data_mexc(symbol)) else None  # Need for get only coins with data
     # if 'kucoin' in exchanges:
     #     print(data) if (data := get_data_binance(symbol)) else None  # Need for get only coins with data
     # if 'gate' in exchanges:
