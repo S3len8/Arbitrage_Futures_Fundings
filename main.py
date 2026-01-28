@@ -1,5 +1,11 @@
 from data import FEES, set_all_symbols_funding, binance_funding, bybit_funding, bitget_funding, mexc_funding, no_kucoin_funding, gate_funding
+from filtered_funding import symbols_map
 
+
+print(symbols_map)
+
+for symbol, exchanges in symbols_map.items():
+    print(symbol, exchanges)
 
 # # Function get funding from binance and bybit in set coins_after_comparison
 # def get_funding(binance: dict, bybit: dict, bitget: dict, mexc: dict, kucoin: dict, gate: dict) -> dict:

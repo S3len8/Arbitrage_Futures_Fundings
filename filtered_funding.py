@@ -1,4 +1,4 @@
-from main import better_funding
+from funding import better_funding
 
 
 def extract_symbols_and_exchanges() -> dict:
