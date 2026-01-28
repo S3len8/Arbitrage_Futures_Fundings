@@ -5,7 +5,7 @@ import requests
 # import hmac
 # import hashlib
 # from urllib.parse import urlencode
-from symbol import BINANCE_ORDER_BOOK, BINANCE_DATA
+from symbol import BINANCE_ORDER_BOOK, BINANCE_DATA, BYBIT_DATA, BITGET
 from filtered_funding import symbols_map
 #
 # API_KEY = 'OcirhzEKhIgPDd9wcV0fOTaMMoVBq3mLY8ESmEFZXcZ53doPfPIgsSZMZVz74bSy'
@@ -375,49 +375,49 @@ def get_data_binance(symbol: str) -> dict:
     return result
 
 
-print(symbols_map)
+def get_data_bybit(symbol: str) -> dict:
+    result = {}
+    # Get data
+    k = requests.get(BYBIT_DATA, params={'category': 'linear'}).json()
+
+    for t in k['result']['list']:
+        if t['symbol'] == symbol:
+            result[symbol] = {
+                'bid': float(t['bid1Price']),
+                'ask': float(t['ask1Price']),
+                'volume 24H': float(t['turnover24h']),
+            }
+    return result
+
+
+def get_data_bitget(symbol: str) -> dict:
+    result = {}
+    k = requests.get(BITGET).json()
+    for t in k['data']:
+        if t['symbol'] == symbol:
+            result[symbol] = {
+                'bid': float(t['bidPr']),
+                'ask': float(t['askPr']),
+                'volume 24H': float(t['usdtVolume']),
+            }
+    return result
+
 
 for symbol, exchanges in symbols_map.items():
     if 'binance' in exchanges:
         print(data) if (data := get_data_binance(symbol)) else None  # Need for get only coins with data
+    if 'bybit' in exchanges:
+        print(data) if (data := get_data_binance(symbol)) else None  # Need for get only coins with data
+    if 'bitget' in exchanges:
+        print(data) if (data := get_data_binance(symbol)) else None  # Need for get only coins with data
+    # if 'mexc' in exchanges:
+    #     print(data) if (data := get_data_binance(symbol)) else None  # Need for get only coins with data
+    # if 'kucoin' in exchanges:
+    #     print(data) if (data := get_data_binance(symbol)) else None  # Need for get only coins with data
+    # if 'gate' in exchanges:
+    #     print(data) if (data := get_data_binance(symbol)) else None  # Need for get only coins with data
 #
 #
-# def get_data_bybit(common_symbols: list[str]) -> dict:
-#     symbols_set = set(common_symbols)
-#     result = {}
-#     # Get data
-#     k = requests.get(BYBIT_DATA, params={'category': 'linear'}).json()
-#
-#     for t in k['result']['list']:
-#         symbol = t['symbol']
-#         if symbol not in symbols_set:
-#             continue
-#
-#         result[symbol] = {
-#             'bid': float(t['bid1Price']),
-#             'ask': float(t['ask1Price']),
-#             'volume 24H': float(t['turnover24h']),
-#             # 'funding': float(t['fundingRate'])
-#         }
-#     return result
-#
-#
-# def get_data_bitget(common_symbol: list[str]) -> dict:
-#     symbols_set = set(common_symbol)
-#     result = {}
-#     k = requests.get(BITGET).json()
-#     for t in k['data']:
-#         symbol = t['symbol']
-#         if symbol not in symbols_set:
-#             continue
-#
-#         result[symbol] = {
-#             'bid': float(t['bidPr']),
-#             'ask': float(t['askPr']),
-#             'volume 24H': float(t['usdtVolume']),
-#             'funding': float(t['fundingRate'])
-#         }
-#     return result
 #
 #
 # binance_data = get_data_binance(common_symbols)  # <class 'dict'>
