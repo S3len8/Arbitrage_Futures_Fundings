@@ -1,7 +1,7 @@
 from main import better_funding
 
 
-def extract_symbols_and_exchanges(data: dict) -> dict:
+def extract_symbols_and_exchanges() -> dict:
     """
     Return:
     {
@@ -11,14 +11,14 @@ def extract_symbols_and_exchanges(data: dict) -> dict:
     """
     result = {}
 
-    for _, symbols in data.items():
+    for _, symbols in better_funding.items():
         for symbol, exchanges in symbols.items():
             result[symbol] = list(exchanges.keys())
 
     return result
 
 
-symbols_map = extract_symbols_and_exchanges(better_funding)
+symbols_map = extract_symbols_and_exchanges()
 print(symbols_map)
 
 for symbol, exchanges in symbols_map.items():

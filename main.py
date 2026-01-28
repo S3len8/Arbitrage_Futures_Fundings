@@ -57,7 +57,7 @@ def get_better_funding():
     for count, symbols in funding.items():
         filtered_symbols = {}
         for symbol, exchanges in symbols.items():
-            if any(abs(funding) >= 0.2 for funding in exchanges.values()):
+            if any(abs(funding) >= 0.9 for funding in exchanges.values()):
                 filtered_symbols[symbol] = exchanges
 
         if filtered_symbols:

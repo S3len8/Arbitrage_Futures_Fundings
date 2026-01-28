@@ -342,6 +342,19 @@ set_all_symbols_funding = set().union(binance_funding, bybit_funding, bitget_fun
 # print(set_all_symbols_funding, len(set_all_symbols_funding))
 
 
+# def get_data_binance(symbol):
+#     print(symbol)
+#
+#
+#
+# symbols_map = extract_symbols_and_exchanges()
+# print(symbols_map)
+# def get_need_symbols():
+#     for symbol, exchanges in symbols_map:
+#         if 'binance' in exchanges:
+#             get_data_binance(symbol)
+
+
 # # Function for data binance
 # def get_data_binance() -> dict:
 #     symbols_set = set(common_symbols)
