@@ -1,10 +1,12 @@
 # import aiohttp
 # import asyncio
-# import requests
+import requests
 # import time
 # import hmac
 # import hashlib
 # from urllib.parse import urlencode
+from symbol import BINANCE_ORDER_BOOK, BINANCE_DATA
+from filtered_funding import symbols_map
 #
 # API_KEY = 'OcirhzEKhIgPDd9wcV0fOTaMMoVBq3mLY8ESmEFZXcZ53doPfPIgsSZMZVz74bSy'
 # API_SECRET = 'jvYQuPuM26KLvY3M67FlYtAZpCHLTf7Hc3qBhs7Ch5DPx6mxQ7mqDCwZnMywm1Sf'
@@ -355,38 +357,29 @@
 #             get_data_binance(symbol)
 
 
-# # Function for data binance
-# def get_data_binance() -> dict:
-#     symbols_set = set(common_symbols)
-#     result = {}
-#     # Get volume
-#     k = requests.get(BINANCE_DATA).json()
-#     # Get funding
-#     # v = requests.get(BINANCE_FUNDING).json()
-#     # Get orderbook
-#     q = requests.get(BINANCE_ORDER_BOOK).json()
-#     # funding = {
-#     #     f['symbol']: float(f['lastFundingRate'])
-#     #     for f in v
-#     #     if f['symbol'] in symbols_set
-#     # }
-#     volume = {
-#         vol['symbol']: float(vol['quoteVolume'])
-#         for vol in k
-#         if vol['symbol'] in symbols_set
-#     }
-#     for t in q:
-#         symbol = t['symbol']
-#         if symbol not in symbols_set:
-#             continue
-#
-#         result[symbol] = {
-#             'bid': float(t['bidPrice']),
-#             'ask': float(t['askPrice']),
-#             'volume 24H': volume.get(symbol, 0.0),
-#             # 'funding': funding.get(symbol, 0.0)
-#         }
-#     return result
+# Function for data binance
+def get_data_binance(symbol: str) -> dict:
+    result = {}
+    # Get volume
+    k = requests.get(BINANCE_DATA).json()
+    # Get orderbook
+    q = requests.get(BINANCE_ORDER_BOOK).json()
+    volume = {vol['symbol']: float(vol['quoteVolume']) for vol in k}
+    for t in q:
+        if t['symbol'] == symbol:
+            result[symbol] = {
+                'bid': float(t['bidPrice']),
+                'ask': float(t['askPrice']),
+                'volume 24H': volume.get(symbol, 0.0),
+            }
+    return result
+
+
+print(symbols_map)
+
+for symbol, exchanges in symbols_map.items():
+    if 'binance' in exchanges:
+        print(data) if (data := get_data_binance(symbol)) else None  # Need for get only coins with data
 #
 #
 # def get_data_bybit(common_symbols: list[str]) -> dict:

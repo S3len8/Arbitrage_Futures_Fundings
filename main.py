@@ -1,11 +1,5 @@
 from data import FEES, set_all_symbols_funding, binance_funding, bybit_funding, bitget_funding, mexc_funding, no_kucoin_funding, gate_funding
-from filtered_funding import symbols_map
 
-
-print(symbols_map)
-
-for symbol, exchanges in symbols_map.items():
-    print(symbol, exchanges)
 
 # # Function get funding from binance and bybit in set coins_after_comparison
 # def get_funding(binance: dict, bybit: dict, bitget: dict, mexc: dict, kucoin: dict, gate: dict) -> dict:
@@ -76,78 +70,78 @@ for symbol, exchanges in symbols_map.items():
 # print(better_funding)
 
 
-# def middle_price_exchanges(binance: dict, bybit: dict):
-#     result = {}
-#     exchanges_data = binance.keys() & bybit.keys()  # Unite keys from exchanges <class 'set'>
-#     for symbol in exchanges_data:  # Get symbols from data
-#         askBinance = binance[symbol]['ask']
-#         bidBinance = binance[symbol]['bid']
-#         askBybit = bybit[symbol]['ask']
-#         bidBybit = bybit[symbol]['bid']
-#         if symbol in funding:  # Checking availability symbols in funding
-#             middle_price = (askBinance + bidBinance + askBybit + bidBybit) / 4
-#             result[symbol] = {
-#                 'symbol': symbol,
-#                 'askBinance': float(askBinance),
-#                 'bidBinance': float(bidBinance),
-#                 'askBybit': float(askBybit),
-#                 'bidBybit': float(bidBybit),
-#                 'middle price': float(middle_price),
-#             }
-#     return result
-#
-#
-# middle_price = middle_price_exchanges(binance_data, bybit_data)
-# print(middle_price)
-#
-#
-# def entry_spread():
-#     result = {}
-#     for symbol in funding:
-#         funding_A = funding[symbol]['binance']
-#         funding_B = funding[symbol]['bybit']
-#         ask_A = float(middle_price[symbol]['askBinance'])
-#         bid_A = float(middle_price[symbol]['bidBinance'])
-#         ask_B = float(middle_price[symbol]['askBybit'])
-#         bid_B = float(middle_price[symbol]['bidBybit'])
-#         middle_price_A = middle_price[symbol]['middle price']
-#         if funding_A > 0:
-#             result[symbol] = ((ask_A - bid_B) / middle_price_A) * 100
-#         elif funding_A < 0:
-#             result[symbol] = ((ask_B - bid_A) / middle_price_A) * 100
-#     return result
-#
-#
-# def exit_spread():
-#     result = {}
-#     for symbol in funding:
-#         funding_A = funding[symbol]['binance']
-#         funding_B = funding[symbol]['bybit']
-#         ask_A = float(middle_price[symbol]['askBinance'])
-#         bid_A = float(middle_price[symbol]['bidBinance'])
-#         ask_B = float(middle_price[symbol]['askBybit'])
-#         bid_B = float(middle_price[symbol]['bidBybit'])
-#         middle_price_A = middle_price[symbol]['middle price']
-#         if funding_A > 0:
-#             result[symbol] = ((bid_A - ask_B) / middle_price_A) * 100
-#         elif funding_A < 0:
-#             result[symbol] = ((bid_B - ask_A) / middle_price_A) * 100
-#     return result
-#
-#
-# print(entry_spread())
-# print(exit_spread())
-#
-#
-# # This function must calculation fees from two exchanges, like Binance/Bybit, MEXC/Bitget or something like this
-# def get_fees():
-#     result = {}
-#     for exchange, key in FEES.items():  # Get exchange fees and after get maker/taker fee
-#         result[exchange] = {
-#             'maker fee': key['maker:'],
-#             'taker fee': key['taker:'],
-#         }
-#     return result
-#
-#
-# print(get_fees())
+def middle_price_exchanges(binance: dict, bybit: dict):
+    result = {}
+    exchanges_data = binance.keys() & bybit.keys()  # Unite keys from exchanges <class 'set'>
+    for symbol in exchanges_data:  # Get symbols from data
+        askBinance = binance[symbol]['ask']
+        bidBinance = binance[symbol]['bid']
+        askBybit = bybit[symbol]['ask']
+        bidBybit = bybit[symbol]['bid']
+        if symbol in funding:  # Checking availability symbols in funding
+            middle_price = (askBinance + bidBinance + askBybit + bidBybit) / 4
+            result[symbol] = {
+                'symbol': symbol,
+                'askBinance': float(askBinance),
+                'bidBinance': float(bidBinance),
+                'askBybit': float(askBybit),
+                'bidBybit': float(bidBybit),
+                'middle price': float(middle_price),
+            }
+    return result
+
+
+middle_price = middle_price_exchanges(binance_data, bybit_data)
+print(middle_price)
+
+
+def entry_spread():
+    result = {}
+    for symbol in funding:
+        funding_A = funding[symbol]['binance']
+        funding_B = funding[symbol]['bybit']
+        ask_A = float(middle_price[symbol]['askBinance'])
+        bid_A = float(middle_price[symbol]['bidBinance'])
+        ask_B = float(middle_price[symbol]['askBybit'])
+        bid_B = float(middle_price[symbol]['bidBybit'])
+        middle_price_A = middle_price[symbol]['middle price']
+        if funding_A > 0:
+            result[symbol] = ((ask_A - bid_B) / middle_price_A) * 100
+        elif funding_A < 0:
+            result[symbol] = ((ask_B - bid_A) / middle_price_A) * 100
+    return result
+
+
+def exit_spread():
+    result = {}
+    for symbol in funding:
+        funding_A = funding[symbol]['binance']
+        funding_B = funding[symbol]['bybit']
+        ask_A = float(middle_price[symbol]['askBinance'])
+        bid_A = float(middle_price[symbol]['bidBinance'])
+        ask_B = float(middle_price[symbol]['askBybit'])
+        bid_B = float(middle_price[symbol]['bidBybit'])
+        middle_price_A = middle_price[symbol]['middle price']
+        if funding_A > 0:
+            result[symbol] = ((bid_A - ask_B) / middle_price_A) * 100
+        elif funding_A < 0:
+            result[symbol] = ((bid_B - ask_A) / middle_price_A) * 100
+    return result
+
+
+print(entry_spread())
+print(exit_spread())
+
+
+# This function must calculation fees from two exchanges, like Binance/Bybit, MEXC/Bitget or something like this
+def get_fees():
+    result = {}
+    for exchange, key in FEES.items():  # Get exchange fees and after get maker/taker fee
+        result[exchange] = {
+            'maker fee': key['maker:'],
+            'taker fee': key['taker:'],
+        }
+    return result
+
+
+print(get_fees())

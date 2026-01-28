@@ -19,7 +19,7 @@ def extract_symbols_and_exchanges() -> dict:
 
 
 symbols_map = extract_symbols_and_exchanges()
-print(symbols_map)
-
-for symbol, exchanges in symbols_map.items():
-    print(symbol, exchanges)
+# print(symbols_map)
+#
+# for symbol, exchanges in symbols_map.items():
+#     print(symbol, exchanges)
