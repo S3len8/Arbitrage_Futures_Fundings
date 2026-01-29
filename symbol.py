@@ -22,6 +22,7 @@ MEXC = 'https://contract.mexc.com/api/v1/contract/ticker'
 
 KUCOIN = 'https://api-futures.kucoin.com/api/v1/contracts/active'
 KUCOIN_FUNDING = "https://api-futures.kucoin.com/api/v1/funding-rate/{symbol}/current"
+KUCOIN_ORDER_BOOK = 'https://api-futures.kucoin.com/api/v1/ticker'
 
 GATE = 'https://api.gateio.ws/api/v4/futures/usdt/tickers'
 
