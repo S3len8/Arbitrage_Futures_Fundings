@@ -5,7 +5,7 @@ import requests
 # import hmac
 # import hashlib
 # from urllib.parse import urlencode
-from symbol import BINANCE_ORDER_BOOK, BINANCE_DATA, BYBIT_DATA, BITGET, MEXC, KUCOIN_ORDER_BOOK
+from symbol import BINANCE_ORDER_BOOK, BINANCE_DATA, BYBIT_DATA, BITGET, MEXC, KUCOIN, KUCOIN_ORDER_BOOK, GATE
 from filtered_funding import symbols_map
 #
 # API_KEY = 'OcirhzEKhIgPDd9wcV0fOTaMMoVBq3mLY8ESmEFZXcZ53doPfPIgsSZMZVz74bSy'
@@ -395,7 +395,7 @@ def get_data_bitget(symbol: str) -> dict:
     params = {"productType": "USDT-FUTURES"}
     k = requests.get(BITGET, params=params).json()
     for t in k['data']:
-        if t['symbol'] == symbol.replace('USDT', 'USD'):
+        if t['symbol'] == symbol:
             result[symbol] = {
                 'bid': float(t['bidPr']),
                 'ask': float(t['askPr']),
@@ -419,30 +419,47 @@ def get_data_mexc(symbol: str) -> dict:
 
 def get_data_kucoin(symbol: str) -> dict:
     result = {}
-    k = requests.get(KUCOIN_ORDER_BOOK).json()
-    for t in k['data']:
-        if t['symbol'] == symbol.replace('BTC', 'XBT').replace('USDT', 'USDTM'):
+    symbol_kucoin = symbol.replace('USDT', 'USDTM').replace('BTC', 'XBT')
+    k = requests.get(KUCOIN_ORDER_BOOK, params={"symbol": symbol_kucoin}).json()
+    d = requests.get(KUCOIN, params={"symbol": symbol_kucoin}).json()
+    data = k['data']
+    for c in d["data"]:
+        if c["symbol"] == symbol_kucoin:
+            volume = float(c.get("turnoverOf24h", 0))
+    result[symbol] = {
+        'bid': float(data['bestBidPrice']),
+        'ask': float(data['bestAskPrice']),
+        'volume 24H': volume,
+    }
+    return result
+
+
+def get_data_gate(symbol: str) -> dict:
+    result = {}
+    k = requests.get(GATE).json()
+    for t in k:
+        if t['contract'] == symbol:
             result[symbol] = {
-                'bid': float(t['bestBidPrice']),
-                'ask': float(t['bestAskPrice']),
-                'volume 24H': float(t['turnoverOf24h']),
+                'bid': float(t['highest_bid']),
+                'ask': float(t['lowest_ask']),
+                'volume 24H': float(t['volume_24h_base']),
             }
-        return result
+    return result
 
 
 for symbol, exchanges in symbols_map.items():
     if 'binance' in exchanges:
-        print(data) if (data := get_data_binance(symbol)) else None  # Need for get only coins with data
+        print(f"Binance {data}") if (data := get_data_binance(symbol)) else None  # Need for get only coins with data
     if 'bybit' in exchanges:
-        print(data) if (data := get_data_bybit(symbol)) else None  # Need for get only coins with data
+        print(f"Bybit {data}") if (data := get_data_bybit(symbol)) else None  # Need for get only coins with data
     if 'bitget' in exchanges:
-        print(data) if (data := get_data_bitget(symbol)) else None  # Need for get only coins with data
+        print(f"Bitget {data}") if (data := get_data_bitget(symbol)) else None  # Need for get only coins with data
     if 'mexc' in exchanges:
-        print(data) if (data := get_data_mexc(symbol)) else None  # Need for get only coins with data
+        print(f"MEXC {data}") if (data := get_data_mexc(symbol)) else None  # Need for get only coins with data
     if 'kucoin' in exchanges:
-        print(data) if (data := get_data_binance(symbol)) else None  # Need for get only coins with data
-    # if 'gate' in exchanges:
-    #     print(data) if (data := get_data_binance(symbol)) else None  # Need for get only coins with data
+        print(f"Kucoin {data}") if (data := get_data_kucoin(symbol)) else None  # Need for get only coins with data
+    if 'gate' in exchanges:
+        print(f"Gate {data}") if (data := get_data_gate(symbol)) else None  # Need for get only coins with data
 #
 #
 #
