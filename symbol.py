@@ -256,7 +256,7 @@ def get_funding_mexc():
         if normalize_symbol in symbols_set:
             continue
         result[normalize_symbol] = {
-            'funding': float(t['fundingRate'])
+            'funding': float(t['fundingRate']) if 'fundingRate' in t else None
         }
     return result
 

@@ -438,7 +438,7 @@ def get_data_gate(symbol: str) -> dict:
     result = {}
     k = requests.get(GATE).json()
     for t in k:
-        if t['contract'] == symbol:
+        if t['contract'] == symbol.replace('USDT', '_USDT'):
             result[symbol] = {
                 'bid': float(t['highest_bid']),
                 'ask': float(t['lowest_ask']),
@@ -447,19 +447,44 @@ def get_data_gate(symbol: str) -> dict:
     return result
 
 
-for symbol, exchanges in symbols_map.items():
-    if 'binance' in exchanges:
-        print(f"Binance {data}") if (data := get_data_binance(symbol)) else None  # Need for get only coins with data
-    if 'bybit' in exchanges:
-        print(f"Bybit {data}") if (data := get_data_bybit(symbol)) else None  # Need for get only coins with data
-    if 'bitget' in exchanges:
-        print(f"Bitget {data}") if (data := get_data_bitget(symbol)) else None  # Need for get only coins with data
-    if 'mexc' in exchanges:
-        print(f"MEXC {data}") if (data := get_data_mexc(symbol)) else None  # Need for get only coins with data
-    if 'kucoin' in exchanges:
-        print(f"Kucoin {data}") if (data := get_data_kucoin(symbol)) else None  # Need for get only coins with data
-    if 'gate' in exchanges:
-        print(f"Gate {data}") if (data := get_data_gate(symbol)) else None  # Need for get only coins with data
+def collect_symbols_and_data():
+    result = {}
+    for symbol, exchanges in symbols_map.items():
+        result[symbol] = {}
+        if 'binance' in exchanges:
+            if data := get_data_binance(symbol):  # Need for get only coins with data
+                result[symbol]['binance'] = data
+            else:
+                print(None)
+        if 'bybit' in exchanges:
+            if data := get_data_bybit(symbol):  # Need for get only coins with data
+                result[symbol]['bybit'] = data
+            else:
+                print(None)
+        if 'bitget' in exchanges:
+            if data := get_data_bitget(symbol):  # Need for get only coins with data
+                result[symbol]['bitget'] = data
+            else:
+                print(None)
+        if 'mexc' in exchanges:
+            if data := get_data_mexc(symbol):  # Need for get only coins with data
+                result[symbol]['mexc'] = data
+            else:
+                print(None)
+        if 'kucoin' in exchanges:
+            if data := get_data_kucoin(symbol):  # Need for get only coins with data
+                result[symbol]['kucoin'] = data
+            else:
+                print(None)
+        if 'gate' in exchanges:
+            if data := get_data_gate(symbol):  # Need for get only coins with data
+                result[symbol]['gate'] = data
+            else:
+                print(None)
+    return result
+
+
+print(collect_symbols_and_data())
 #
 #
 #
