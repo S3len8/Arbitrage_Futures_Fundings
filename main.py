@@ -1,18 +1,23 @@
 from data import collect_symbols_and_data
-from filtered_funding import symbols_map
+from funding import better_funding
 
 
 def better_funding_symbols():
     result = {}
-    for count, fundingValue in symbols_map.items():
-        for exchanges in fundingValue:
-            print(exchanges)
-            binance_funding = exchanges['binance']
-            bybit_funding = exchanges['bybit']
-            bitget_funding = exchanges['bitget']
-            mexc_funding = exchanges['mexc']
-            kucoin_funding = exchanges['kucoin']
-            gate_funding = exchanges['gate']
+    for count, symbols in better_funding.items():
+        for symbol, exchanges in symbols.items():
+            if 'binance' in exchanges:
+                binance_funding = exchanges['binance']
+            if 'bybit' in exchanges:
+                bybit_funding = exchanges['bybit']
+            if 'bitget' in exchanges:
+                bitget_funding = exchanges['bitget']
+            if 'mexc' in exchanges:
+                mexc_funding = exchanges['mexc']
+            if 'kucoin' in exchanges:
+                kucoin_funding = exchanges['kucoin']
+            if 'gate' in exchanges:
+                gate_funding = exchanges['gate']
     for symbol, value in collect_symbols_and_data.items():
         for exchange, data in value.items():
             for k, v in data.items():
