@@ -4,104 +4,77 @@ from funding import better_funding
 
 def better_funding_symbols():
     result = {}
-    for count, symbols in better_funding.items():
+
+    for _, symbols in better_funding.items():
         for symbol, exchanges in symbols.items():
-            if 'binance' in exchanges:
-                binance_funding = exchanges['binance']
-            if 'bybit' in exchanges:
-                bybit_funding = exchanges['bybit']
-            if 'bitget' in exchanges:
-                bitget_funding = exchanges['bitget']
-            if 'mexc' in exchanges:
-                mexc_funding = exchanges['mexc']
-            if 'kucoin' in exchanges:
-                kucoin_funding = exchanges['kucoin']
-            if 'gate' in exchanges:
-                gate_funding = exchanges['gate']
-    for symbol, value in collect_symbols_and_data.items():
-        for exchange, data in value.items():
-            for k, v in data.items():
-                result[symbol] = {
-                    'bid': v['bid'],
-                    'ask': v['ask'],
-                    'volume 24H': v['volume 24H'],
-                    'hghjj': binance_funding,
-                }
+
+            # 1. funding
+            fundings = {
+                ex: f for ex, f in exchanges.items()
+                if f is not None
+            }
+
+            if len(fundings) < 2:
+                continue
+
+            # Sorting funding in abs
+            sorted_fundings = sorted(fundings.items(), key=lambda x: abs(x[1]))
+
+            small_ex, small_f = sorted_fundings[0]
+            big_ex, big_f = sorted_fundings[-1]
+
+            abs_small = abs(small_f)
+            abs_big = abs(big_f)
+
+            # Spread between small funding and big funding
+            if (small_f > 0 and big_f < 0) or (small_f < 0 and big_f > 0):
+                spread = abs_big + abs_small
+            else:
+                spread = abs_big - abs_small
+
+            # Collect all data from dict
+            symbol_data = collect_symbols_and_data.get(symbol)
+            if not symbol_data:
+                continue
+
+            def get_market(exchange):
+                ex_data = symbol_data.get(exchange)
+                if not ex_data:
+                    return None
+                market = ex_data.get(symbol)
+                return market
+
+            small_market = get_market(small_ex)
+            big_market = get_market(big_ex)
+
+            # If one coin haven`t orderbook
+            if not small_market or not big_market:
+                continue
+
+            # Result
+            result[symbol] = {
+                'small_exchange': small_ex,
+                'small_funding': small_f,
+                'small_bid': small_market['bid'],
+                'small_ask': small_market['ask'],
+                'small_volume_24H': small_market['volume 24H'],
+
+                'big_exchange': big_ex,
+                'big_funding': big_f,
+                'big_bid': big_market['bid'],
+                'big_ask': big_market['ask'],
+                'big_volume_24H': big_market['volume 24H'],
+
+                'funding_spread': spread,
+            }
+
     return result
 
 
 print(better_funding_symbols())
 
-# # Function get funding from binance and bybit in set coins_after_comparison
-# def get_funding(binance: dict, bybit: dict, bitget: dict, mexc: dict, kucoin: dict, gate: dict) -> dict:
-#     result = {
-#         6: {},  # Coin in 6
-#         5: {},  # Coin in 5
-#         4: {},  # Coin in 4
-#         3: {},  # Coin in 3
-#         2: {},  # Coin in 2
-#         1: {},  # Coin in 1
-#     }  # <class 'dict'>
-#     for symbol in set_all_symbols_funding:
-#         exchanges = {}
-#         if symbol in binance and binance[symbol].get('funding') is not None:  # Getting and calculation funding in percent from Binance
-#             funding = binance[symbol]['funding'] * 100
-#             exchanges['binance'] = funding
-#
-#         if symbol in bybit and bybit[symbol].get('funding') is not None:  # Getting and calculation funding in percent from Bybit
-#             funding = bybit[symbol]['funding'] * 100
-#             exchanges['bybit'] = funding
-#
-#         if symbol in bitget and bitget[symbol].get('funding') is not None:  # Getting and calculation funding in percent from Bitget
-#             funding = bitget[symbol]['funding'] * 100
-#             exchanges['bitget'] = funding
-#
-#         if symbol in mexc and mexc[symbol].get('funding') is not None:  # Getting and calculation funding in percent from Mexc
-#             funding = mexc[symbol]['funding'] * 100
-#             exchanges['mexc'] = funding
-#
-#         if symbol in kucoin and isinstance(kucoin[symbol], dict) and kucoin[symbol].get('funding') is not None:  # Getting and calculation funding in percent from Kucoin
-#             funding = kucoin[symbol]['funding'] * 100
-#             exchanges['kucoin'] = funding
-#
-#         if symbol in gate and gate[symbol].get('funding') is not None:  # Getting and calculation funding in percent from Gate
-#             funding = gate[symbol]['funding'] * 100
-#             exchanges['gate'] = funding
-#         count = len(exchanges)
-#
-#         if count == 0:
-#             continue
-#
-#         result[count][symbol] = exchanges
-#
-#     return result
-#
-#
-# funding = get_funding(binance_funding, bybit_funding, bitget_funding, mexc_funding, no_kucoin_funding, gate_funding)  # <class 'dict'>
-# print(funding)
-# for key in [6, 5, 4, 3, 2, 1]:
-#     print(f"{key} exchanges: {funding.get(key)}")
-#
-#
-# def get_better_funding():
-#     result = {}
-#     for count, symbols in funding.items():
-#         filtered_symbols = {}
-#         for symbol, exchanges in symbols.items():
-#             if any(abs(funding) >= 0.9 for funding in exchanges.values()):
-#                 filtered_symbols[symbol] = exchanges
-#
-#         if filtered_symbols:
-#             result[count] = filtered_symbols
-#
-#     return result
-#
-#
-# better_funding = get_better_funding()  # <class 'dict'>
-# print(better_funding)
 
-
-def middle_price_exchanges(binance: dict, bybit: dict):
+def middle_price_exchanges():
     result = {}
     exchanges_data = binance.keys() & bybit.keys()  # Unite keys from exchanges <class 'set'>
     for symbol in exchanges_data:  # Get symbols from data
@@ -122,7 +95,7 @@ def middle_price_exchanges(binance: dict, bybit: dict):
     return result
 
 
-middle_price = middle_price_exchanges(binance_data, bybit_data)
+middle_price = middle_price_exchanges()
 print(middle_price)
 
 
