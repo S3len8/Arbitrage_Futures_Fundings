@@ -71,17 +71,13 @@ def better_funding_symbols():
     return result
 
 
-print(better_funding_symbols())
+better_funding_symbols = better_funding_symbols()
+print(better_funding_symbols)
 
 
 def middle_price_exchanges():
     result = {}
-    exchanges_data = binance.keys() & bybit.keys()  # Unite keys from exchanges <class 'set'>
-    for symbol in exchanges_data:  # Get symbols from data
-        askBinance = binance[symbol]['ask']
-        bidBinance = binance[symbol]['bid']
-        askBybit = bybit[symbol]['ask']
-        bidBybit = bybit[symbol]['bid']
+    for symbol in better_funding_symbols:  # Get symbols from data
         if symbol in funding:  # Checking availability symbols in funding
             middle_price = (askBinance + bidBinance + askBybit + bidBybit) / 4
             result[symbol] = {
