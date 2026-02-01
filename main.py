@@ -1,5 +1,6 @@
 from data import collect_symbols_and_data
 from funding import better_funding
+from symbol import FEES
 
 
 def better_funding_symbols():
@@ -122,9 +123,9 @@ def exit_spread():
         big_ask = value['big_ask']
         middle_price_EntrySpread = (big_ask + big_bid + small_ask + small_bid) / 4
         if bigFunding > 0:
-            result[symbol] = ((big_bid - small_ask) / middle_price_EntrySpread) * 100
-        elif bigFunding < 0:
             result[symbol] = ((small_bid - big_ask) / middle_price_EntrySpread) * 100
+        elif bigFunding < 0:
+            result[symbol] = ((big_bid - small_ask) / middle_price_EntrySpread) * 100
     return result
 
 
