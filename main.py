@@ -77,17 +77,16 @@ print(better_funding_symbols)
 
 def middle_price_exchanges():
     result = {}
-    for symbol in better_funding_symbols:  # Get symbols from data
-        if symbol in funding:  # Checking availability symbols in funding
-            middle_price = (askBinance + bidBinance + askBybit + bidBybit) / 4
-            result[symbol] = {
-                'symbol': symbol,
-                'askBinance': float(askBinance),
-                'bidBinance': float(bidBinance),
-                'askBybit': float(askBybit),
-                'bidBybit': float(bidBybit),
-                'middle price': float(middle_price),
-            }
+    for symbol, value in better_funding_symbols.items():  # Get symbols from data
+        small_bid = value['small_bid']
+        small_ask = value['small_ask']
+        big_bid = value['big_bid']
+        big_ask = value['big_ask']
+        middle_price = (small_bid + small_ask + big_bid + big_ask) / 4
+        result[symbol] = {
+            'symbol': symbol,
+            'middle price': float(middle_price),
+        }
     return result
 
 
@@ -97,35 +96,35 @@ print(middle_price)
 
 def entry_spread():
     result = {}
-    for symbol in funding:
-        funding_A = funding[symbol]['binance']
-        funding_B = funding[symbol]['bybit']
-        ask_A = float(middle_price[symbol]['askBinance'])
-        bid_A = float(middle_price[symbol]['bidBinance'])
-        ask_B = float(middle_price[symbol]['askBybit'])
-        bid_B = float(middle_price[symbol]['bidBybit'])
-        middle_price_A = middle_price[symbol]['middle price']
-        if funding_A > 0:
-            result[symbol] = ((ask_A - bid_B) / middle_price_A) * 100
-        elif funding_A < 0:
-            result[symbol] = ((ask_B - bid_A) / middle_price_A) * 100
+    for symbol, value in better_funding_symbols.items():
+        smallFunding = value['small_funding']
+        bigFunding = value['big_funding']
+        small_bid = value['small_bid']
+        small_ask = value['small_ask']
+        big_bid = value['big_bid']
+        big_ask = value['big_ask']
+        middle_price_EntrySpread = (big_ask + big_bid + small_ask + small_bid) / 4
+        if bigFunding > 0:
+            result[symbol] = ((small_ask - big_bid) / middle_price_EntrySpread) * 100
+        elif bigFunding < 0:
+            result[symbol] = ((big_ask - small_bid) / middle_price_EntrySpread) * 100
     return result
 
 
 def exit_spread():
     result = {}
-    for symbol in funding:
-        funding_A = funding[symbol]['binance']
-        funding_B = funding[symbol]['bybit']
-        ask_A = float(middle_price[symbol]['askBinance'])
-        bid_A = float(middle_price[symbol]['bidBinance'])
-        ask_B = float(middle_price[symbol]['askBybit'])
-        bid_B = float(middle_price[symbol]['bidBybit'])
-        middle_price_A = middle_price[symbol]['middle price']
-        if funding_A > 0:
-            result[symbol] = ((bid_A - ask_B) / middle_price_A) * 100
-        elif funding_A < 0:
-            result[symbol] = ((bid_B - ask_A) / middle_price_A) * 100
+    for symbol, value in better_funding_symbols.items():
+        smallFunding = value['small_funding']
+        bigFunding = value['big_funding']
+        small_bid = value['small_bid']
+        small_ask = value['small_ask']
+        big_bid = value['big_bid']
+        big_ask = value['big_ask']
+        middle_price_EntrySpread = (big_ask + big_bid + small_ask + small_bid) / 4
+        if bigFunding > 0:
+            result[symbol] = ((big_bid - small_ask) / middle_price_EntrySpread) * 100
+        elif bigFunding < 0:
+            result[symbol] = ((small_bid - big_ask) / middle_price_EntrySpread) * 100
     return result
 
 
