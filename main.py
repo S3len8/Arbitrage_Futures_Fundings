@@ -129,19 +129,50 @@ def exit_spread():
     return result
 
 
-print(entry_spread())
-print(exit_spread())
+entry_Spread = entry_spread()
+exit_Spread = exit_spread()
+print(entry_Spread)
+print(exit_Spread)
 
 
 # This function must calculation fees from two exchanges, like Binance/Bybit, MEXC/Bitget or something like this
 def get_fees():
     result = {}
-    for exchange, key in FEES.items():  # Get exchange fees and after get maker/taker fee
-        result[exchange] = {
-            'maker fee': key['maker:'],
-            'taker fee': key['taker:'],
-        }
+    for k, v in better_funding_symbols.items():
+        exchangeSmall = v['small_exchange']
+        exchangeBig = v['big_exchange']
+        print(exchangeBig, exchangeSmall)
+        for exchange, key in FEES.items():  # Get exchange fees and after get maker/taker fee
+            print(exchange, key)
+            if exchangeSmall in exchange and exchangeBig in exchange:
+                print(exchangeBig, exchangeSmall)
+                result[exchange] = {
+                    'maker fee': key['maker:'],
+                    'taker fee': key['taker:'],
+                }
     return result
 
 
 print(get_fees())
+
+
+def pnl():
+    result = {}
+    for (kEnrty, vEntry), (kExit, vExit) in zip(entry_Spread.items(), exit_Spread.items()):
+        result[kEnrty] = vExit - vEntry
+    return result
+
+
+pnl_exit_entry = pnl()
+print(pnl_exit_entry)
+
+
+def funding_profit():
+    for k, v in better_funding_symbols.items():
+        pnl = pnl_exit_entry.get(k, {})
+        spread = v['funding_spread']
+        funding_profit = spread - fees + pnl
+        print(pnl, spread)
+
+
+funding_profit()
