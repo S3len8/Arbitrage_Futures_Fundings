@@ -189,4 +189,23 @@ print(funding_profit)
 
 
 def print_function():
-    pass
+    result = {}
+    for k, v in better_funding_symbols.items():
+        profitFunding = funding_profit.get(k, {})['Profit']
+        result[k] = {
+            'Small_exchange': v['small_exchange'],
+            'Small_ask': v['small_ask'],
+            'Small_bid': v['small_bid'],
+            'Small_volume_24H': v['small_volume_24H'],
+            'Big_exchange': v['big_exchange'],
+            'Big_ask': v['big_ask'],
+            'Big_bid': v['big_bid'],
+            'Big_volume_24H': v['big_volume_24H'],
+            'Funding_spread': v['funding_spread'],
+            'Profit': profitFunding,
+        }
+    return result
+
+
+print_function = print_function()
+print(print_function)
