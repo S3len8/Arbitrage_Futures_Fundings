@@ -138,22 +138,23 @@ print(exit_Spread)
 # This function must calculation fees from two exchanges, like Binance/Bybit, MEXC/Bitget or something like this
 def get_fees():
     result = {}
-    for k, v in better_funding_symbols.items():
-        exchangeSmall = v['small_exchange']
-        exchangeBig = v['big_exchange']
-        print(exchangeBig, exchangeSmall)
-        for exchange, key in FEES.items():  # Get exchange fees and after get maker/taker fee
-            print(exchange, key)
-            if exchangeSmall in exchange and exchangeBig in exchange:
-                print(exchangeBig, exchangeSmall)
-                result[exchange] = {
-                    'maker fee': key['maker:'],
-                    'taker fee': key['taker:'],
+    fees_lower = {exchange.lower(): fees for exchange, fees in FEES.items()}
+    for symbol, v in better_funding_symbols.items():
+        exchangeSmall = v['small_exchange'].lower()
+        exchangeBig = v['big_exchange'].lower()
+        for exchange in (exchangeSmall, exchangeBig):  # Get exchange fees and after get maker/taker fee
+            if exchange in fees_lower:
+                result[symbol] = {
+                    f'maker fee small_exchange': fees_lower[exchange]['maker:'],
+                    f'taker fee small_exchange': fees_lower[exchange]['taker:'],
+                    f'maker fee big_exchange': fees_lower[exchange]['maker:'],
+                    f'taker fee big_exchange': fees_lower[exchange]['taker:'],
                 }
     return result
 
 
-print(get_fees())
+get_fees = get_fees()
+print(get_fees)
 
 
 def pnl():
@@ -168,11 +169,24 @@ print(pnl_exit_entry)
 
 
 def funding_profit():
+    result = {}
     for k, v in better_funding_symbols.items():
         pnl = pnl_exit_entry.get(k, {})
+        dict_fees = get_fees.get(k, {})
+        fees_small_exchange = dict_fees['taker fee small_exchange']
+        fees_big_exchange = dict_fees['taker fee big_exchange']
+        fees = fees_small_exchange + fees_big_exchange
         spread = v['funding_spread']
-        funding_profit = spread - fees + pnl
-        print(pnl, spread)
+        funding_profit = spread - 2*fees + pnl
+        result[k] = {
+            'Profit': funding_profit,
+        }
+    return result
 
 
-funding_profit()
+funding_profit = funding_profit()
+print(funding_profit)
+
+
+def print_function():
+    pass

@@ -28,28 +28,28 @@ GATE = 'https://api.gateio.ws/api/v4/futures/usdt/tickers'
 
 FEES = {
     'Binance': {
-        'maker:': 0.0002,
-        'taker:': 0.0005,
+        'maker:': 0.02,
+        'taker:': 0.05,
     },
     'Bybit': {
-        'maker:': 0.00036,
-        'taker:': 0.001,
+        'maker:': 0.036,
+        'taker:': 0.1,
     },
     'Bitget': {
-        'maker:': 0.0002,
-        'taker:': 0.0006,
+        'maker:': 0.02,
+        'taker:': 0.06,
     },
     'MEXC': {
-        'maker:': 0.0001,
-        'taker:': 0.0004,
+        'maker:': 0.01,
+        'taker:': 0.04,
     },
     'Gate': {
-        'maker:': 0.0002,
-        'taker:': 0.0005,
+        'maker:': 0.02,
+        'taker:': 0.05,
     },
     'Kucoin': {
-        'maker:': 0.0002,
-        'taker:': 0.0006,
+        'maker:': 0.02,
+        'taker:': 0.06,
     },
 }
 
