@@ -485,7 +485,7 @@ def collect_symbols_and_data():
 
 
 collect_symbols_and_data = collect_symbols_and_data()
-print(collect_symbols_and_data)
+# print(collect_symbols_and_data)
 #
 #
 #

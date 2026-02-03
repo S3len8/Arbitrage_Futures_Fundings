@@ -73,7 +73,7 @@ def better_funding_symbols():
 
 
 better_funding_symbols = better_funding_symbols()
-print(better_funding_symbols)
+# print(better_funding_symbols)
 
 
 def middle_price_exchanges():
@@ -92,7 +92,7 @@ def middle_price_exchanges():
 
 
 middle_price = middle_price_exchanges()
-print(middle_price)
+# print(middle_price)
 
 
 def entry_spread():
@@ -131,8 +131,8 @@ def exit_spread():
 
 entry_Spread = entry_spread()
 exit_Spread = exit_spread()
-print(entry_Spread)
-print(exit_Spread)
+# print(entry_Spread)
+# print(exit_Spread)
 
 
 # This function must calculation fees from two exchanges, like Binance/Bybit, MEXC/Bitget or something like this
@@ -154,7 +154,7 @@ def get_fees():
 
 
 get_fees = get_fees()
-print(get_fees)
+# print(get_fees)
 
 
 def pnl():
@@ -192,18 +192,19 @@ def print_function():
     result = {}
     for k, v in better_funding_symbols.items():
         profitFunding = funding_profit.get(k, {})['Profit']
-        result[k] = {
-            'Small_exchange': v['small_exchange'],
-            'Small_ask': v['small_ask'],
-            'Small_bid': v['small_bid'],
-            'Small_volume_24H': v['small_volume_24H'],
-            'Big_exchange': v['big_exchange'],
-            'Big_ask': v['big_ask'],
-            'Big_bid': v['big_bid'],
-            'Big_volume_24H': v['big_volume_24H'],
-            'Funding_spread': v['funding_spread'],
-            'Profit': profitFunding,
-        }
+        if profitFunding > 0:
+            result[k] = {
+                'Small_exchange': v['small_exchange'],
+                'Small_ask': v['small_ask'],
+                'Small_bid': v['small_bid'],
+                'Small_volume_24H': v['small_volume_24H'],
+                'Big_exchange': v['big_exchange'],
+                'Big_ask': v['big_ask'],
+                'Big_bid': v['big_bid'],
+                'Big_volume_24H': v['big_volume_24H'],
+                'Funding_spread': v['funding_spread'],
+                'Profit': profitFunding,
+            }
     return result
 
 
