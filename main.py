@@ -192,7 +192,7 @@ def print_function():
     result = {}
     for k, v in better_funding_symbols.items():
         profitFunding = funding_profit.get(k, {})['Profit']
-        if profitFunding > 0:
+        if profitFunding > 0.6:
             result[k] = {
                 'Small_exchange': v['small_exchange'],
                 'Small_ask': v['small_ask'],
