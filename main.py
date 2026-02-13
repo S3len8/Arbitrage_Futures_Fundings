@@ -1,3 +1,5 @@
+import time
+
 from data import collect_symbols_and_data
 from funding import better_funding
 from symbol import FEES
@@ -202,11 +204,16 @@ def print_function():
                 'Big_ask': v['big_ask'],
                 'Big_bid': v['big_bid'],
                 'Big_volume_24H': v['big_volume_24H'],
+                # 'Entry spread': entry_Spread,
+                # 'Exit spread': exit_Spread,
+                # 'Pnl': pnl_exit_entry,
                 'Funding_spread': v['funding_spread'],
                 'Profit': profitFunding,
             }
     return result
 
 
-print_function = print_function()
-print(print_function)
+while True:
+    result = print_function()
+    print(result)
+    time.sleep(15)
