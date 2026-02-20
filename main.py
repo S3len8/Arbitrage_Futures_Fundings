@@ -213,7 +213,9 @@ def print_function():
     return result
 
 
-while True:
-    result = print_function()
-    print(result)
-    time.sleep(15)
+result = print_function()
+print(result)
+# while True:
+#     result = print_function()
+#     print(result)
+#     time.sleep(15)

@@ -284,23 +284,63 @@ class FundingApp(ctk.CTk):
 
     def _run_scanner(self):
         try:
-            result = subprocess.run(
-                [sys.executable, SCANNER_SCRIPT],
-                capture_output=True, text=True, timeout=120,
+            process = subprocess.Popen(
+                [sys.executable, "-u", SCANNER_SCRIPT],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                bufsize=1,
             )
-            output = result.stdout.strip()
-            if not output:
-                raise ValueError(result.stderr or "Программа не вернула данных")
 
-            # Попытка парсинга (поддержка и dict, и JSON)
-            try:
-                data = ast.literal_eval(output)
-            except Exception:
-                data = json.loads(output)
+            lines = []
+            for line in process.stdout:
+                line = line.strip()
+                if line:
+                    lines.append(line)
+                    preview = line[:60] + "…" if len(line) > 60 else line
+                    self.after(0, lambda t=preview: self.status_lbl.configure(
+                        text=f"⏳ {t}", text_color=COLORS["warning"]
+                    ))
+
+            process.wait(timeout=600)
+            stderr_out = process.stderr.read().strip()
+
+            if not lines:
+                raise ValueError(
+                    stderr_out or
+                    "Программа не вернула никаких данных.\n"
+                    "Убедись что main.py делает print(словарь) в конце."
+                )
+
+            # Ищем строку-словарь начиная с последней
+            data = None
+            for candidate in reversed(lines):
+                try:
+                    data = ast.literal_eval(candidate)
+                    if isinstance(data, dict):
+                        break
+                except Exception:
+                    try:
+                        data = json.loads(candidate)
+                        if isinstance(data, dict):
+                            break
+                    except Exception:
+                        data = None
+
+            if not isinstance(data, dict):
+                full_output = "\n".join(lines[-5:])
+                raise ValueError(
+                    f"Не удалось найти словарь в выводе программы.\n\n"
+                    f"Последние строки вывода:\n{full_output}\n\n"
+                    f"Убедись что main.py печатает словарь через print()."
+                )
 
             rows = self._parse_data(data)
             self.after(0, self._display_results, rows)
 
+        except subprocess.TimeoutExpired:
+            process.kill()
+            self.after(0, self._show_error, "Превышено время ожидания (10 мин).\nПроверь не завис ли main.py.")
         except Exception as e:
             self.after(0, self._show_error, str(e))
 
