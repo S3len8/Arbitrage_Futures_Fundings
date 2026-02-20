@@ -418,11 +418,26 @@ def get_data_mexc(symbol: str) -> dict:
 
 
 def get_data_kucoin(symbol: str) -> dict:
-    result = {}
-    symbol_kucoin = symbol.replace('USDT', 'USDTM').replace('BTC', 'XBT')
-    k = requests.get(KUCOIN_ORDER_BOOK, params={"symbol": symbol_kucoin}).json()
-    d = requests.get(KUCOIN, params={"symbol": symbol_kucoin}).json()
-    data = k['data']
+    try:
+        result = {}
+        symbol_kucoin = symbol.replace('USDT', 'USDTM').replace('BTC', 'XBT')
+        k = requests.get(KUCOIN_ORDER_BOOK, params={"symbol": symbol_kucoin}).json()
+        d = requests.get(KUCOIN, params={"symbol": symbol_kucoin}).json()
+    except Exception as e:
+        print(f"KuCoin request error for {symbol}: {e}")
+        return None
+
+        # Проверяем code
+    if k.get("code") != "200000":
+        return None
+
+    if d.get("code") != "200000":
+        return None
+
+    data = k.get("data")
+    if not data:
+        return None
+
     for c in d["data"]:
         if c["symbol"] == symbol_kucoin:
             volume = float(c.get("turnoverOf24h", 0))
