@@ -1,9 +1,3 @@
-"""
-Funding Scanner GUI
-Запуск: python main.py
-Зависимости: pip install customtkinter pillow
-"""
-
 import customtkinter as ctk
 import subprocess
 import threading
@@ -16,23 +10,23 @@ from datetime import datetime
 from tkinter import messagebox, filedialog
 
 
-# ─── Настройки темы ────────────────────────────────────────────────────────────
+# ─── Theme settings ────────────────────────────────────────────────────────────
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
-# ─── Путь к сканеру (main.py должен лежать рядом с gui.py) ────────────────────
+# ─── Path to scanner (main.py must be in the same directory as gui.py) ────────
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SCANNER_SCRIPT = os.path.join(BASE_DIR, "main.py")
 
 
-# ─── Цвета ─────────────────────────────────────────────────────────────────────
+# ─── Colors ────────────────────────────────────────────────────────────────────
 COLORS = {
     "bg":        "#0f1117",
     "surface":   "#1a1d2e",
     "card":      "#1e2235",
     "border":    "#2a2d3e",
-    "accent":    "#6366f1",        # индиго
-    "accent2":   "#22d3ee",        # циан
+    "accent":    "#6366f1",        # indigo
+    "accent2":   "#22d3ee",        # cyan
     "success":   "#10b981",
     "warning":   "#f59e0b",
     "danger":    "#ef4444",
@@ -44,28 +38,28 @@ COLORS = {
 }
 
 COLUMNS = [
-    ("Пара",          "pair",         120, "w"),
-    ("Малая биржа",   "small_ex",     110, "center"),
-    ("Ask (мал.)",    "small_ask",     90, "center"),
-    ("Bid (мал.)",    "small_bid",     90, "center"),
-    ("Большая биржа", "big_ex",       110, "center"),
-    ("Ask (бол.)",    "big_ask",       90, "center"),
-    ("Bid (бол.)",    "big_bid",       90, "center"),
-    ("Funding Spread","spread",       130, "center"),
-    ("Profit %",      "profit",       100, "center"),
+    ("Pair",            "pair",         120, "w"),
+    ("Small Exchange",  "small_ex",     110, "center"),
+    ("Ask (small)",     "small_ask",     90, "center"),
+    ("Bid (small)",     "small_bid",     90, "center"),
+    ("Large Exchange",  "big_ex",       110, "center"),
+    ("Ask (large)",     "big_ask",       90, "center"),
+    ("Bid (large)",     "big_bid",       90, "center"),
+    ("Funding Spread",  "spread",       130, "center"),
+    ("Profit %",        "profit",       100, "center"),
 ]
 
 
 def profit_color(profit: float) -> str:
-    """Возвращает цвет в зависимости от значения Profit."""
+    """Returns a color based on the Profit value."""
     if profit >= 2.0:
-        return "#10b981"   # зелёный
+        return "#10b981"   # green
     elif profit >= 1.0:
-        return "#22d3ee"   # циан
+        return "#22d3ee"   # cyan
     elif profit >= 0.5:
-        return "#f59e0b"   # жёлтый
+        return "#f59e0b"   # yellow
     else:
-        return "#ef4444"   # красный
+        return "#ef4444"   # red
 
 
 class TableRow(ctk.CTkFrame):
@@ -137,7 +131,7 @@ class FundingApp(ctk.CTk):
     # ─── UI ────────────────────────────────────────────────────────────────────
 
     def _build_ui(self):
-        # ── Шапка ──────────────────────────────────────────────────────────────
+        # ── Header ─────────────────────────────────────────────────────────────
         header = ctk.CTkFrame(self, fg_color=COLORS["surface"], corner_radius=0, height=70)
         header.pack(fill="x")
         header.pack_propagate(False)
@@ -152,7 +146,7 @@ class FundingApp(ctk.CTk):
 
         self.status_lbl = ctk.CTkLabel(
             header,
-            text="● Готов к сканированию",
+            text="● Ready to scan",
             font=ctk.CTkFont(size=13),
             text_color=COLORS["muted"],
         )
@@ -166,14 +160,14 @@ class FundingApp(ctk.CTk):
         )
         self.time_lbl.pack(side="right", padx=24)
 
-        # ── Панель управления ──────────────────────────────────────────────────
+        # ── Control panel ──────────────────────────────────────────────────────
         ctrl = ctk.CTkFrame(self, fg_color=COLORS["surface"], corner_radius=0, height=60)
         ctrl.pack(fill="x", pady=(2, 0))
         ctrl.pack_propagate(False)
 
         self.scan_btn = ctk.CTkButton(
             ctrl,
-            text="🔍  Сканировать",
+            text="🔍  Scan",
             command=self._start_scan,
             font=ctk.CTkFont(size=14, weight="bold"),
             fg_color=COLORS["accent"],
@@ -186,7 +180,7 @@ class FundingApp(ctk.CTk):
 
         self.export_btn = ctk.CTkButton(
             ctrl,
-            text="💾  Экспорт CSV",
+            text="💾  Export CSV",
             command=self._export_csv,
             font=ctk.CTkFont(size=13),
             fg_color=COLORS["card"],
@@ -199,7 +193,7 @@ class FundingApp(ctk.CTk):
         )
         self.export_btn.pack(side="left", padx=4)
 
-        # Фильтр по минимальному Profit
+        # Filter by minimum Profit
         filter_lbl = ctk.CTkLabel(
             ctrl, text="Min Profit %:", text_color=COLORS["muted"],
             font=ctk.CTkFont(size=13),
@@ -215,7 +209,7 @@ class FundingApp(ctk.CTk):
         self.profit_entry.pack(side="left")
 
         apply_btn = ctk.CTkButton(
-            ctrl, text="Применить", command=self._apply_filter,
+            ctrl, text="Apply", command=self._apply_filter,
             font=ctk.CTkFont(size=12),
             fg_color=COLORS["card"], hover_color=COLORS["border"],
             border_color=COLORS["accent2"], border_width=1,
@@ -223,19 +217,19 @@ class FundingApp(ctk.CTk):
         )
         apply_btn.pack(side="left", padx=8)
 
-        # Счётчик результатов
+        # Results counter
         self.count_lbl = ctk.CTkLabel(
-            ctrl, text="Результатов: —",
+            ctrl, text="Results: —",
             font=ctk.CTkFont(size=13), text_color=COLORS["muted"],
         )
         self.count_lbl.pack(side="right", padx=20)
 
-        # ── Прогресс-бар ───────────────────────────────────────────────────────
+        # ── Progress bar ───────────────────────────────────────────────────────
         self.progress = ctk.CTkProgressBar(self, fg_color=COLORS["border"], progress_color=COLORS["accent"])
         self.progress.pack(fill="x", padx=0)
         self.progress.set(0)
 
-        # ── Таблица (скролл) ───────────────────────────────────────────────────
+        # ── Table (scrollable) ─────────────────────────────────────────────────
         self.table_frame = ctk.CTkScrollableFrame(
             self, fg_color=COLORS["bg"],
             scrollbar_button_color=COLORS["border"],
@@ -243,41 +237,41 @@ class FundingApp(ctk.CTk):
         )
         self.table_frame.pack(fill="both", expand=True, padx=16, pady=(12, 0))
 
-        # Заголовок таблицы
+        # Table header
         self.header_row = HeaderRow(self.table_frame)
         self.header_row.pack(fill="x", pady=(0, 4))
 
-        # Контейнер строк
+        # Rows container
         self.rows_container = ctk.CTkFrame(self.table_frame, fg_color="transparent")
         self.rows_container.pack(fill="x")
 
-        # ── Пустое состояние ───────────────────────────────────────────────────
+        # ── Empty state ────────────────────────────────────────────────────────
         self.empty_lbl = ctk.CTkLabel(
             self.rows_container,
-            text="Нажмите «Сканировать» для поиска лучшего фандинга",
+            text="Click «Scan» to find the best funding rates",
             font=ctk.CTkFont(size=16),
             text_color=COLORS["muted"],
         )
         self.empty_lbl.pack(pady=80)
 
-        # ── Подвал ─────────────────────────────────────────────────────────────
+        # ── Footer ─────────────────────────────────────────────────────────────
         footer = ctk.CTkFrame(self, fg_color=COLORS["surface"], corner_radius=0, height=32)
         footer.pack(fill="x", side="bottom")
         footer.pack_propagate(False)
 
         ctk.CTkLabel(
-            footer, text="Funding Scanner  •  данные в реальном времени",
+            footer, text="Funding Scanner  •  real-time data",
             font=ctk.CTkFont(size=11), text_color=COLORS["muted"],
         ).pack(side="left", padx=16)
 
-    # ─── Сканирование ──────────────────────────────────────────────────────────
+    # ─── Scanning ──────────────────────────────────────────────────────────────
 
     def _start_scan(self):
         if self._running:
             return
         self._running = True
-        self.scan_btn.configure(state="disabled", text="⏳  Сканирую...")
-        self.status_lbl.configure(text="● Сканирование...", text_color=COLORS["warning"])
+        self.scan_btn.configure(state="disabled", text="⏳  Scanning...")
+        self.status_lbl.configure(text="● Scanning...", text_color=COLORS["warning"])
         self.progress.configure(mode="indeterminate")
         self.progress.start()
         threading.Thread(target=self._run_scanner, daemon=True).start()
@@ -308,11 +302,11 @@ class FundingApp(ctk.CTk):
             if not lines:
                 raise ValueError(
                     stderr_out or
-                    "Программа не вернула никаких данных.\n"
-                    "Убедись что main.py делает print(словарь) в конце."
+                    "The program returned no data.\n"
+                    "Make sure main.py prints a dictionary at the end."
                 )
 
-            # Ищем строку-словарь начиная с последней
+            # Search for a dictionary line starting from the last one
             data = None
             for candidate in reversed(lines):
                 try:
@@ -330,9 +324,9 @@ class FundingApp(ctk.CTk):
             if not isinstance(data, dict):
                 full_output = "\n".join(lines[-5:])
                 raise ValueError(
-                    f"Не удалось найти словарь в выводе программы.\n\n"
-                    f"Последние строки вывода:\n{full_output}\n\n"
-                    f"Убедись что main.py печатает словарь через print()."
+                    f"Could not find a dictionary in the program output.\n\n"
+                    f"Last lines of output:\n{full_output}\n\n"
+                    f"Make sure main.py prints a dictionary via print()."
                 )
 
             rows = self._parse_data(data)
@@ -340,7 +334,7 @@ class FundingApp(ctk.CTk):
 
         except subprocess.TimeoutExpired:
             process.kill()
-            self.after(0, self._show_error, "Превышено время ожидания (10 мин).\nПроверь не завис ли main.py.")
+            self.after(0, self._show_error, "Timeout exceeded (10 min).\nCheck if main.py is stuck.")
         except Exception as e:
             self.after(0, self._show_error, str(e))
 
@@ -366,8 +360,8 @@ class FundingApp(ctk.CTk):
         self._stop_progress()
         self._render_rows(rows)
         ts = datetime.now().strftime("%H:%M:%S")
-        self.time_lbl.configure(text=f"Обновлено: {ts}")
-        self.status_lbl.configure(text=f"● Готово  —  найдено {len(rows)} пар", text_color=COLORS["success"])
+        self.time_lbl.configure(text=f"Updated: {ts}")
+        self.status_lbl.configure(text=f"● Done  —  found {len(rows)} pairs", text_color=COLORS["success"])
 
     def _apply_filter(self):
         try:
@@ -378,47 +372,47 @@ class FundingApp(ctk.CTk):
         self._render_rows(filtered)
 
     def _render_rows(self, rows: list[dict]):
-        # Очистка
+        # Clear
         for widget in self.rows_container.winfo_children():
             widget.destroy()
 
         if not rows:
             ctk.CTkLabel(
                 self.rows_container,
-                text="Нет данных по заданному фильтру",
+                text="No data matching the current filter",
                 font=ctk.CTkFont(size=15),
                 text_color=COLORS["muted"],
             ).pack(pady=60)
-            self.count_lbl.configure(text="Результатов: 0")
+            self.count_lbl.configure(text="Results: 0")
             return
 
         for i, row_data in enumerate(rows):
             row = TableRow(self.rows_container, row_data, i)
             row.pack(fill="x", pady=1)
 
-        self.count_lbl.configure(text=f"Результатов: {len(rows)}")
+        self.count_lbl.configure(text=f"Results: {len(rows)}")
 
     def _show_error(self, msg: str):
         self._stop_progress()
-        self.status_lbl.configure(text="● Ошибка", text_color=COLORS["danger"])
-        messagebox.showerror("Ошибка сканера", msg)
+        self.status_lbl.configure(text="● Error", text_color=COLORS["danger"])
+        messagebox.showerror("Scanner Error", msg)
 
     def _stop_progress(self):
         self.progress.stop()
         self.progress.configure(mode="determinate")
         self.progress.set(1)
-        self.scan_btn.configure(state="normal", text="🔍  Сканировать")
+        self.scan_btn.configure(state="normal", text="🔍  Scan")
         self._running = False
 
-    # ─── Экспорт ───────────────────────────────────────────────────────────────
+    # ─── Export ────────────────────────────────────────────────────────────────
 
     def _export_csv(self):
         if not self._last_data:
-            messagebox.showinfo("Экспорт", "Нет данных для экспорта. Запустите сканирование.")
+            messagebox.showinfo("Export", "No data to export. Run a scan first.")
             return
         path = filedialog.asksaveasfilename(
             defaultextension=".csv",
-            filetypes=[("CSV файлы", "*.csv")],
+            filetypes=[("CSV files", "*.csv")],
             initialfile=f"funding_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
         )
         if not path:
@@ -427,10 +421,10 @@ class FundingApp(ctk.CTk):
             writer = csv.DictWriter(f, fieldnames=list(self._last_data[0].keys()))
             writer.writeheader()
             writer.writerows(self._last_data)
-        messagebox.showinfo("Экспорт", f"Сохранено: {path}")
+        messagebox.showinfo("Export", f"Saved: {path}")
 
 
-# ─── Запуск ────────────────────────────────────────────────────────────────────
+# ─── Launch ────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     app = FundingApp()
     app.mainloop()
