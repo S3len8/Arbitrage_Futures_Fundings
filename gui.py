@@ -9,6 +9,13 @@ import sys
 from datetime import datetime
 from tkinter import messagebox, filedialog
 
+# ─── Database integration ─────────────────────────────────────────────────────
+try:
+    from bd import init_db, save_funding_results, is_available as db_is_available
+    DB_ENABLED = True
+except ImportError:
+    DB_ENABLED = False
+
 
 # ─── Theme settings ────────────────────────────────────────────────────────────
 ctk.set_appearance_mode("dark")
@@ -125,8 +132,10 @@ class FundingApp(ctk.CTk):
 
         self._last_data: list[dict] = []
         self._running = False
+        self._db_ok = False
 
         self._build_ui()
+        self._init_database()
 
     # ─── UI ────────────────────────────────────────────────────────────────────
 
@@ -192,6 +201,15 @@ class FundingApp(ctk.CTk):
             width=150,
         )
         self.export_btn.pack(side="left", padx=4)
+
+        # DB status indicator
+        self.db_status_lbl = ctk.CTkLabel(
+            ctrl,
+            text="🗄 DB: checking...",
+            font=ctk.CTkFont(size=12),
+            text_color=COLORS["muted"],
+        )
+        self.db_status_lbl.pack(side="left", padx=(16, 4))
 
         # Filter by minimum Profit
         filter_lbl = ctk.CTkLabel(
@@ -362,6 +380,58 @@ class FundingApp(ctk.CTk):
         ts = datetime.now().strftime("%H:%M:%S")
         self.time_lbl.configure(text=f"Updated: {ts}")
         self.status_lbl.configure(text=f"● Done  —  found {len(rows)} pairs", text_color=COLORS["success"])
+
+        # ── Save to PostgreSQL if DB is available ──────────────────────────────
+        if rows and self._db_ok:
+            threading.Thread(target=self._save_to_db, args=(rows,), daemon=True).start()
+
+    def _init_database(self):
+        """Initialize DB connection in background thread."""
+        if not DB_ENABLED:
+            self.after(0, lambda: self.db_status_lbl.configure(
+                text="🗄 DB: not installed",
+                text_color=COLORS["muted"],
+            ))
+            return
+        threading.Thread(target=self._check_and_init_db, daemon=True).start()
+
+    def _check_and_init_db(self):
+        """Background: check connection and create table."""
+        if not db_is_available():
+            self._db_ok = False
+            self.after(0, lambda: self.db_status_lbl.configure(
+                text="🗄 DB: disconnected",
+                text_color=COLORS["danger"],
+            ))
+            return
+        ok = init_db()
+        self._db_ok = ok
+        if ok:
+            self.after(0, lambda: self.db_status_lbl.configure(
+                text="🗄 DB: connected ✓",
+                text_color=COLORS["success"],
+            ))
+        else:
+            self.after(0, lambda: self.db_status_lbl.configure(
+                text="🗄 DB: init error",
+                text_color=COLORS["danger"],
+            ))
+
+    def _save_to_db(self, rows: list[dict]):
+        """Background: save funding rows to PostgreSQL."""
+        count = save_funding_results(rows)
+        if count > 0:
+            self.after(0, lambda: self.db_status_lbl.configure(
+                text=f"🗄 DB: saved {count} rows ✓",
+                text_color=COLORS["success"],
+            ))
+        elif count == 0:
+            pass  # nothing to save
+        else:
+            self.after(0, lambda: self.db_status_lbl.configure(
+                text="🗄 DB: save error",
+                text_color=COLORS["danger"],
+            ))
 
     def _apply_filter(self):
         try:
