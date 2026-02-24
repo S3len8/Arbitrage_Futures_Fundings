@@ -213,4 +213,3 @@ def print_function():
 
 
 result = print_function()
-print(result)
