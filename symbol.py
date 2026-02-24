@@ -1,10 +1,7 @@
 import aiohttp
 import asyncio
 import requests
-import time
-import hmac
-import hashlib
-from urllib.parse import urlencode
+
 
 API_KEY = 'OcirhzEKhIgPDd9wcV0fOTaMMoVBq3mLY8ESmEFZXcZ53doPfPIgsSZMZVz74bSy'
 API_SECRET = 'jvYQuPuM26KLvY3M67FlYtAZpCHLTf7Hc3qBhs7Ch5DPx6mxQ7mqDCwZnMywm1Sf'
@@ -106,17 +103,6 @@ def get_mexc_symbol():
     return result
 
 
-# def get_kucoin_symbol():
-#     result = []
-#     data = requests.get(KUCOIN).json()
-#     for key in data['data']:
-#         symbol = key['symbol']
-#         result.append({
-#             'symbol': symbol.replace('XBT', 'BTC').replace('USDTM', 'USDT'),
-#         })
-#
-#     return result
-
 async def get_kucoin_symbol():
     async with aiohttp.ClientSession() as session:
         async with session.get(KUCOIN) as kucoin:
@@ -143,7 +129,6 @@ bitget = get_bitget_symbol()  #  [{'symbol': 'BTCUSDT'}, {'symbol': 'ETHUSDT'}, 
 mexc = get_mexc_symbol()  # [{'symbol': 'BTCUSDT'}, {'symbol': 'ETHUSDT'}, {'symbol': 'SOLUSDT'}, {'symbol': 'RIVERUSDT'}, {'symbol': 'XAUTUSDT'}, {'symbol': 'BTCUSD'}, {'symbol': 'SILVERUSDT'}]
 kucoin = asyncio.run(get_kucoin_symbol())  # {'BTC': 'XBTUSDTM', 'ETH': 'ETHUSDTM', 'SOL': 'SOLUSDTM', 'WIF': 'WIFUSDTM', 'PEPE': 'PEPEUSDTM', 'DOGE': 'DOGEUSDTM', 'XRP': 'XRPUSDTM', '0G': '0GUSDTM'} [{'symbol': 'XBTUSDTM'}, {'symbol': 'ETHUSDTM'}, {'symbol': 'SOLUSDTM'}, {'symbol': 'WIFUSDTM'}, {'symbol': 'PEPEUSDTM'}, {'symbol': 'DOGEUSDTM'}, {'symbol': 'XRPUSDTM'}]
 gate = get_gate_symbol()  # [{'symbol': 'RAREUSDT'}, {'symbol': 'FILUSDT'}, {'symbol': 'GIGGLEUSDT'}, {'symbol': 'RECALLUSDT'}, {'symbol': 'LYNUSDT'}, {'symbol': 'SONICUSDT'}, {'symbol': 'TAUSDT'}]
-# print(kucoin)
 
 
 async def fetch_all_and_compare():
@@ -173,7 +158,6 @@ def comparison_symbols(binance: list, bybit: list, bitget: list, mexc: list, kuc
 kucoin = asyncio.run(fetch_all_and_compare())
 kucoin_list = kucoin[0]
 common_symbols = comparison_symbols(binance=binance, bybit=bybit, bitget=bitget, mexc=mexc, kucoin=kucoin_list, gate=gate)  # <class 'list'>
-# print(common_symbols, len(common_symbols))  # ['INJ', 'NIL', 'DEXE', 'PTB', 'REZ', 'CHZ', 'BANANA', 'ANIME', 'ANKR', 'FLUID', 'RENDER', 'C98', 'BLUAI', 'CTK', 'PIPPIN', 'GMX', 'LINEA', 'EVAA', 'COOKIE', 'MYX', 'ENJ']
 
 
 def get_funding_binance() -> dict:
@@ -261,30 +245,6 @@ def get_funding_mexc():
     return result
 
 
-# def get_funding_kucoin():
-#     symbols_set = set(common_symbols)
-#     result = {}
-#     symbols = get_kucoin_symbol()
-#     for item in symbols:
-#         symbol = item['symbol']
-#         url = f"https://api-futures.kucoin.com/api/v1/funding-rate/{symbol}/current"
-#         r = requests.get(url).json()
-#         data = r.get('data')
-#         normalize_symbol = symbol.replace('XBT', 'BTC')
-#         print(data)
-#         if not data:
-#             continue
-#         if normalize_symbol in symbols_set:
-#             continue
-#         print(normalize_symbol)
-#         result[normalize_symbol] = {
-#             'funding': float(data['value'])
-#         }
-#
-#         time.sleep(0.05)  # Rate limit
-#
-#     return result
-
 async def fetch_funding(session, symbol):
     url = KUCOIN_FUNDING.format(symbol=symbol)
     try:
@@ -332,12 +292,4 @@ mexc_funding = get_funding_mexc()  # Example {'BTCUSDT': {'funding': 5e-05}, 'ET
 kucoin_funding = asyncio.run(get_funding_kucoin(symbols))  # Example {'BTCUSDT': {'funding': -7e-06}, 'ETHUSDT': {'funding': -5.5e-05}, 'SOLUSDT': {'funding': -2.8e-05}, 'WIFUSDT': {'funding': -3e-06}, 'PEPEUSDT': {'funding': -2.2e-05}}  {'XBTUSDTM': {'funding': -7e-06}, 'ETHUSDTM': {'funding': 1.3e-05}, 'SOLUSDTM': {'funding': -3e-06}, 'WIFUSDTM': {'funding': 0.000173}, 'PEPEUSDTM': {'funding': -0.000166}}
 gate_funding = get_funding_gate()  # Example {'DOTUSDT': {'funding': -0.00012}, '人生K线USDT': {'funding': 5e-05}, 'IMXUSDT': {'funding': 5e-05}, 'USUALUSDT': {'funding': 1.2e-05}, 'EPICUSDT': {'funding': -0.00166}, 'IPUSDT': {'funding': 1.2e-05}}
 no_kucoin_funding = {k.replace('USDTM', 'USDT').replace('XBT', 'BTC'): v for k, v in kucoin_funding.items()}  # Need for converting symbols ETHUSDTM to ETHUSDT
-# print(binance_funding)
-# print(bybit_funding)
-# print(bitget_funding)
-# print(mexc_funding)
-# print(kucoin_funding)
-# print(gate_funding)
-# print(no_kucoin_funding)
 set_all_symbols_funding = set().union(binance_funding, bybit_funding, bitget_funding, mexc_funding, no_kucoin_funding, gate_funding)
-# print(set_all_symbols_funding, len(set_all_symbols_funding))

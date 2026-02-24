@@ -1,8 +1,9 @@
-import time
-
 from data import collect_symbols_and_data
 from funding import better_funding
 from symbol import FEES
+
+
+PROFIT_FUNDING_FILTER = 0.6
 
 
 def better_funding_symbols():
@@ -133,8 +134,6 @@ def exit_spread():
 
 entry_Spread = entry_spread()
 exit_Spread = exit_spread()
-# print(entry_Spread)
-# print(exit_Spread)
 
 
 # This function must calculation fees from two exchanges, like Binance/Bybit, MEXC/Bitget or something like this
@@ -194,7 +193,7 @@ def print_function():
     result = {}
     for k, v in better_funding_symbols.items():
         profitFunding = funding_profit.get(k, {})['Profit']
-        if profitFunding > 0.6:
+        if profitFunding > PROFIT_FUNDING_FILTER:
             result[k] = {
                 'Small_exchange': v['small_exchange'],
                 'Small_ask': v['small_ask'],
@@ -215,7 +214,3 @@ def print_function():
 
 result = print_function()
 print(result)
-# while True:
-#     result = print_function()
-#     print(result)
-#     time.sleep(15)

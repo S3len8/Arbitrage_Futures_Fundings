@@ -1,6 +1,9 @@
 from symbol import FEES, set_all_symbols_funding, binance_funding, bybit_funding, bitget_funding, mexc_funding, no_kucoin_funding, gate_funding
 
 
+BETTER_FUNDING_FILTER = 0.2
+
+
 # Function get funding from binance and bybit in set coins_after_comparison
 def get_funding(binance: dict, bybit: dict, bitget: dict, mexc: dict, kucoin: dict, gate: dict) -> dict:
     result = {
@@ -47,9 +50,6 @@ def get_funding(binance: dict, bybit: dict, bitget: dict, mexc: dict, kucoin: di
 
 
 funding = get_funding(binance_funding, bybit_funding, bitget_funding, mexc_funding, no_kucoin_funding, gate_funding)  # <class 'dict'>
-# print(funding)
-# for key in [6, 5, 4, 3, 2, 1]:
-#     print(f"{key} exchanges: {funding.get(key)}")
 
 
 def get_better_funding():
@@ -57,7 +57,7 @@ def get_better_funding():
     for count, symbols in funding.items():
         filtered_symbols = {}
         for symbol, exchanges in symbols.items():
-            if any(abs(funding) >= 0.2 for funding in exchanges.values()):
+            if any(abs(funding) >= BETTER_FUNDING_FILTER for funding in exchanges.values()):
                 filtered_symbols[symbol] = exchanges
 
         if filtered_symbols:
@@ -67,4 +67,3 @@ def get_better_funding():
 
 
 better_funding = get_better_funding()  # <class 'dict'>
-# print(better_funding)
