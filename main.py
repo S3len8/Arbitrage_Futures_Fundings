@@ -166,7 +166,7 @@ def pnl():
 
 
 pnl_exit_entry = pnl()
-print(pnl_exit_entry)
+# print(pnl_exit_entry)
 
 
 def funding_profit():
@@ -186,7 +186,7 @@ def funding_profit():
 
 
 funding_profit = funding_profit()
-print(funding_profit)
+# print(funding_profit)
 
 
 def print_function():
@@ -212,4 +212,6 @@ def print_function():
     return result
 
 
-result = print_function()
+if __name__ == '__main__':
+    result = print_function()
+    print(result)
