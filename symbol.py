@@ -95,11 +95,14 @@ def get_bitget_symbol():
 def get_mexc_symbol():
     result = []
     data = requests.get(MEXC).json()
-    for key in data['data']:
-        symbol = key['symbol']
-        result.append({
-            'symbol': symbol.replace('_', '')
-        })
+    try:
+        for key in data['data']:
+            symbol = key['symbol']
+            result.append({
+                'symbol': symbol.replace('_', '')
+            })
+    except KeyError as e:
+        print(f'KeyError as {e}')
     return result
 
 
